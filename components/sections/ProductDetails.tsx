@@ -62,7 +62,10 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
 
   const handleLike = async () => {
     if (isLiking || !product) return;
-
+    if (!product.id) {
+      console.error('Error: Product ID is missing. Cannot toggle like.');
+      return;
+    }
     try {
       setIsLiking(true);
       const action = hasLiked ? 'remove' : 'add';
