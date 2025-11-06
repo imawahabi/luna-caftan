@@ -35,6 +35,9 @@ export default function ProductsPage() {
   const fetchProducts = async () => {
     try {
       const res = await fetch('/api/products');
+      if (!res.ok) {
+        throw new Error(`API error: Status ${res.status}`);
+      }
       const data = await res.json();
       
       // Sort by creation date (newest first)
@@ -45,6 +48,7 @@ export default function ProductsPage() {
       setProducts(sortedData);
     } catch (error) {
       console.error('Error fetching products:', error);
+      alert('فشل تحميل القفاطين. تحقق من الاتصال بالخادم.');
     } finally {
       setLoading(false);
     }

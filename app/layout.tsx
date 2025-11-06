@@ -25,6 +25,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/logo.png" type="image/png" />
+      </head>
       <body className={cairo.variable} suppressHydrationWarning>
         <Providers>
           {children}
