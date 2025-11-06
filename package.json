@@ -1,0 +1,50 @@
+{
+  "name": "luna-caftan",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "setup:admin": "node scripts/create-admin.ts",
+    "setup:products": "node scripts/migrate-products.ts",
+    "setup:settings": "node scripts/setup-settings.ts",
+    "setup:all": "npm run db:migrate && npm run setup:admin && npm run setup:products && npm run setup:settings"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "@uploadthing/react": "^7.3.3",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.3",
+    "framer-motion": "^12.23.24",
+    "i18next": "^25.6.0",
+    "lucide-react": "^0.552.0",
+    "next": "16.0.1",
+    "next-auth": "^4.24.13",
+    "next-i18next": "^15.4.2",
+    "prisma": "^6.19.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-i18next": "^16.2.4",
+    "uploadthing": "^7.7.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.16",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.21",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.1",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.16",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  }
+}

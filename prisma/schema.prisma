@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Admin User Model
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Product/Caftan Model
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  nameEn        String
+  description   String
+  descriptionEn String
+  price         String
+  priceEn       String
+  details       String   // JSON string array
+  detailsEn     String   // JSON string array
+  images        String   // JSON string array
+  featured      Boolean  @default(false)
+  active        Boolean  @default(true)
+  likes         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Site Settings Model
+model Settings {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
