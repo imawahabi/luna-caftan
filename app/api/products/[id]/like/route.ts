@@ -4,10 +4,10 @@ import { prisma } from '@/lib/prisma';
 // POST - Toggle like for a product (add or remove)
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = params.id;
+    const { id: productId } = await params;
     const body = await request.json();
     const action = body?.action; // 'add' or 'remove'
 
@@ -75,10 +75,10 @@ export async function POST(
 // GET - Get likes count for a product
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = params.id;
+    const { id: productId } = await params;
 
     const product = await prisma.product.findUnique({
       where: { id: productId },
