@@ -42,14 +42,40 @@ export default function ImageUploader({
     setExternalUrl(currentValue);
   }, [currentValue]);
 
+  const parseJsonResponse = async (res: Response) => {
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return res.json();
+    }
+
+    const text = await res.text();
+    throw new Error(text || (res.ok ? 'استجابة غير متوقعة من الخادم' : 'تعذر الاتصال بالخادم'));
+  };
+
   const fetchUploadedImages = async () => {
     setLoadingGallery(true);
     try {
       const res = await fetch('/api/upload');
-      const data = await res.json();
+      if (!res.ok) {
+        const data = await parseJsonResponse(res).catch((err) => {
+          throw err;
+        });
+        if (data && typeof data === 'object' && 'error' in data) {
+          throw new Error((data as { error?: string }).error || 'تعذر تحميل الصور');
+        }
+      }
+
+      const data = await parseJsonResponse(res);
       setUploadedImages(data.images || []);
     } catch (err) {
       console.error('Error fetching images:', err);
+      if (err instanceof Error) {
+        setError(err.message.includes('Request Entity Too Large')
+          ? 'حجم الصورة أكبر من الحد المسموح. يرجى اختيار صورة أقل حجماً.'
+          : err.message);
+      } else {
+        setError('حدث خطأ أثناء تحميل الصور.');
+      }
     } finally {
       setLoadingGallery(false);
     }
@@ -71,10 +97,22 @@ export default function ImageUploader({
         body: formData,
       });
 
-      const data = await res.json();
+      let data: any = null;
+      try {
+        data = await parseJsonResponse(res);
+      } catch (parseErr) {
+        if (!res.ok) {
+          throw parseErr;
+        }
+        throw new Error('استجابة غير متوقعة من الخادم');
+      }
 
       if (!res.ok) {
-        throw new Error(data.error || 'فشل رفع الصورة');
+        throw new Error(data?.error || 'فشل رفع الصورة');
+      }
+
+      if (!data?.url) {
+        throw new Error('لم يتم استلام رابط الصورة من الخادم');
       }
 
       onImageSelect(data.url);
@@ -82,7 +120,16 @@ export default function ImageUploader({
       setUseExternalUrl(false);
       await fetchUploadedImages();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'حدث خطأ أثناء رفع الصورة');
+      const message = err instanceof Error ? err.message : 'حدث خطأ أثناء رفع الصورة';
+      if (message.includes('Request Entity Too Large') || message.includes('413')) {
+        setError('حجم الصورة أكبر من الحد المسموح. يرجى اختيار صورة أقل من 5 ميغابايت.');
+      } else if (message.toLowerCase().includes('unexpected token')) {
+        setError('استجابة غير متوقعة من الخادم. يرجى المحاولة لاحقاً أو رفع صورة أصغر.');
+      } else if (message.toLowerCase().includes('timeout')) {
+        setError('انتهت مهلة الاتصال بالخادم. حاول مرة أخرى.');
+      } else {
+        setError(message || 'حدث خطأ أثناء رفع الصورة');
+      }
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
