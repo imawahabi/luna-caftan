@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Trash2, Edit, Eye, EyeOff, 
-  Package, TrendingUp, ShoppingBag
+  Package, TrendingUp, Star,
+  Calendar, Images, List
 } from 'lucide-react';
 import DeleteConfirmModal from '@/components/DeleteConfirmModal';
 import AddCaftanButton from '@/components/AddCaftanButton';
@@ -18,6 +19,9 @@ interface Product {
   images: string[];
   featured: boolean;
   active: boolean;
+  createdAt?: string;
+  details?: string[];
+  detailsEn?: string[];
 }
 
 interface Stats {
@@ -98,6 +102,17 @@ export default function DashboardPage() {
       </div>
     );
   }
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'غير محدد';
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return 'غير محدد';
+    return date.toLocaleDateString('ar-UK', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
 
   const StatCard = ({ title, value, icon: Icon, color, gradient }: any) => (
     <div style={{
@@ -221,7 +236,7 @@ export default function DashboardPage() {
         <StatCard
           title="القفاطين المميزة"
           value={stats.featured}
-          icon={ShoppingBag}
+          icon={Star}
           color="#a78bfa"
           gradient="linear-gradient(135deg, rgba(167, 139, 250, 0.15), rgba(139, 92, 246, 0.08))"
         />
@@ -246,215 +261,283 @@ export default function DashboardPage() {
         gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
         gap: '1.5rem',
       }}>
-        {products.map((product) => (
-          <div
-            key={product.id}
-            style={{
-              background: 'rgba(26, 20, 16, 0.6)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(232, 199, 111, 0.2)',
-              borderRadius: '16px',
-              overflow: 'hidden',
-              transition: 'all 0.3s',
-            }}
-          >
-            <div style={{ height: '250px', position: 'relative', overflow: 'hidden' }}>
-              <img
-                src={product.images[0] || '/placeholder.jpg'}
-                alt={product.name}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                }}
-              />
-              {/* Status Badges */}
-              <div style={{
-                position: 'absolute',
-                top: '12px',
-                right: '12px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem',
-                alignItems: 'flex-end',
-              }}>
-                {!product.active && (
-                  <div style={{
-                    background: 'rgba(239, 68, 68, 0.95)',
-                    backdropFilter: 'blur(10px)',
-                    color: 'white',
-                    padding: '0.5rem 0.9rem',
-                    borderRadius: '20px',
-                    fontSize: '0.8rem',
-                    fontWeight: '600',
-                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4)',
-                  }}>
-                    غير نشط
-                  </div>
-                )}
-                {product.featured && (
-                  <div style={{
-                    background: 'rgba(147, 51, 234, 0.95)',
-                    backdropFilter: 'blur(10px)',
-                    color: 'white',
-                    padding: '0.5rem 0.9rem',
-                    borderRadius: '20px',
-                    fontSize: '0.8rem',
-                    fontWeight: '600',
-                    boxShadow: '0 4px 12px rgba(147, 51, 234, 0.4)',
-                  }}>
-                    ⭐ مميز
-                  </div>
-                )}
-              </div>
-              
-              {/* Toggle Active Button - Top Left */}
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleToggleActive(product.id, product.active);
-                }}
-                style={{
+        {products.map((product) => {
+          const isInactive = !product.active;
+          const cardStyle: CSSProperties = {
+            background: isInactive ? 'rgba(60, 60, 60, 0.4)' : 'rgba(26, 20, 16, 0.6)',
+            backdropFilter: 'blur(10px)',
+            border: isInactive ? '1px solid rgba(148, 163, 184, 0.35)' : '1px solid rgba(232, 199, 111, 0.2)',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            transition: 'all 0.3s ease',
+            filter: isInactive ? 'grayscale(100%) brightness(0.85)' : 'none',
+            opacity: isInactive ? 0.78 : 1,
+            position: 'relative',
+          };
+
+          const imageStyle: CSSProperties = {
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transform: isInactive ? 'scale(1.02)' : 'none',
+            transition: 'transform 0.3s ease',
+          };
+
+          const safeImages = Array.isArray(product.images) ? product.images : [];
+          const safeDetails = Array.isArray(product.details) ? product.details : [];
+          const imageCount = safeImages.length;
+          const detailsCount = safeDetails.length;
+          const metaBadgeStyle: CSSProperties = {
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            background: 'rgba(15, 23, 42, 0.45)',
+            border: '1px solid rgba(148, 163, 184, 0.3)',
+            borderRadius: '999px',
+            padding: '0.35rem 0.75rem',
+            fontSize: '0.75rem',
+            color: 'var(--color-light-gold)',
+            lineHeight: 1,
+            letterSpacing: '0.3px',
+            backdropFilter: 'blur(8px)',
+          };
+
+          return (
+            <div key={product.id} style={cardStyle}>
+              <div style={{ height: '250px', position: 'relative', overflow: 'hidden' }}>
+                <img
+                  src={product.images[0] || '/placeholder.jpg'}
+                  alt={product.name}
+                  style={imageStyle}
+                />
+
+                {/* Status Badges */}
+                <div style={{
                   position: 'absolute',
                   top: '12px',
-                  left: '12px',
-                  padding: '0.6rem',
-                  background: product.active 
-                    ? 'rgba(251, 146, 60, 0.95)'
-                    : 'rgba(34, 197, 94, 0.95)',
-                  backdropFilter: 'blur(10px)',
-                  border: 'none',
-                  borderRadius: '50%',
-                  color: 'white',
-                  cursor: 'pointer',
+                  right: '12px',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.3s',
-                  boxShadow: product.active 
-                    ? '0 4px 12px rgba(251, 146, 60, 0.4)'
-                    : '0 4px 12px rgba(34, 197, 94, 0.4)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.1)';
-                  e.currentTarget.style.boxShadow = product.active 
-                    ? '0 6px 16px rgba(251, 146, 60, 0.6)'
-                    : '0 6px 16px rgba(34, 197, 94, 0.6)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                  e.currentTarget.style.boxShadow = product.active 
-                    ? '0 4px 12px rgba(251, 146, 60, 0.4)'
-                    : '0 4px 12px rgba(34, 197, 94, 0.4)';
-                }}
-                title={product.active ? 'إخفاء القفطان' : 'إظهار القفطان'}
-              >
-                {product.active ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
+                  flexDirection: 'column',
+                  gap: '0.5rem',
+                  alignItems: 'flex-end',
+                }}>
+                  {!product.active && (
+                    <div style={{
+                      background: 'rgba(148, 163, 184, 0.9)',
+                      backdropFilter: 'blur(10px)',
+                      color: '#f8fafc',
+                      padding: '0.5rem 0.9rem',
+                      borderRadius: '20px',
+                      fontSize: '0.8rem',
+                      fontWeight: '600',
+                      boxShadow: '0 4px 12px rgba(148, 163, 184, 0.35)',
+                    }}>
+                      غير نشط
+                    </div>
+                  )}
+                  {product.featured && (
+                    <div style={{
+                      background: 'rgba(147, 51, 234, 0.95)',
+                      backdropFilter: 'blur(10px)',
+                      color: 'white',
+                      padding: '0.5rem 0.9rem',
+                      borderRadius: '20px',
+                      fontSize: '0.8rem',
+                      fontWeight: '600',
+                      boxShadow: '0 4px 12px rgba(147, 51, 234, 0.4)',
+                    }}>
+                      ⭐ مميز
+                    </div>
+                  )}
+                </div>
 
-            <div style={{ padding: '1.25rem' }}>
-              <h3 style={{
-                fontSize: '1.1rem',
-                color: 'var(--color-cream)',
-                marginBottom: '0.5rem',
-                fontWeight: '600',
-              }}>
-                {product.name}
-              </h3>
-              <p style={{
-                color: 'var(--color-gold)',
-                fontSize: '1rem',
-                marginBottom: '1.25rem',
-                fontWeight: '500',
-              }}>
-                {product.price}
-              </p>
-
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '0.5rem',
-              }}>
-                {/* Edit Button */}
+                {/* Toggle Active Button */}
                 <button
-                  onClick={() => router.push(`/admin/dashboard/products/${product.id}`)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleToggleActive(product.id, product.active);
+                  }}
                   style={{
-                    padding: '0.75rem',
-                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.1))',
-                    border: '1px solid rgba(59, 130, 246, 0.4)',
-                    borderRadius: '10px',
-                    color: '#60a5fa',
+                    position: 'absolute',
+                    top: '12px',
+                    left: '12px',
+                    padding: '0.6rem',
+                    background: product.active
+                      ? 'rgba(251, 146, 60, 0.95)'
+                      : 'rgba(34, 197, 94, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    border: 'none',
+                    borderRadius: '50%',
+                    color: 'white',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '0.5rem',
-                    fontSize: '0.875rem',
-                    fontWeight: '600',
-                    transition: 'all 0.3s',
+                    transition: 'all 0.3s ease',
+                    boxShadow: product.active
+                      ? '0 4px 12px rgba(251, 146, 60, 0.4)'
+                      : '0 4px 12px rgba(34, 197, 94, 0.4)',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(37, 99, 235, 0.15))';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+                    e.currentTarget.style.transform = 'scale(1.1)';
+                    e.currentTarget.style.boxShadow = product.active
+                      ? '0 6px 16px rgba(251, 146, 60, 0.6)'
+                      : '0 6px 16px rgba(34, 197, 94, 0.6)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.1))';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = product.active
+                      ? '0 4px 12px rgba(251, 146, 60, 0.4)'
+                      : '0 4px 12px rgba(34, 197, 94, 0.4)';
                   }}
+                  title={product.active ? 'إخفاء القفطان' : 'إظهار القفطان'}
                 >
-                  <Edit size={16} />
-                  <span>تعديل</span>
-                </button>
-
-                {/* Delete Button */}
-                <button
-                  onClick={() => setDeleteModal({ isOpen: true, product })}
-                  style={{
-                    padding: '0.75rem',
-                    background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1))',
-                    border: '1px solid rgba(239, 68, 68, 0.4)',
-                    borderRadius: '10px',
-                    color: '#ef4444',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem',
-                    fontSize: '0.875rem',
-                    fontWeight: '600',
-                    transition: 'all 0.3s',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.15))';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1))';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                >
-                  <Trash2 size={16} />
-                  <span>حذف</span>
+                  {product.active ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+
+              <div style={{ padding: '1.25rem', position: 'relative' }}>
+                {!product.active && (
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.25), rgba(15, 23, 42, 0.35))',
+                    pointerEvents: 'none',
+                  }} />
+                )}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.35rem',
+                  marginBottom: '1rem',
+                }}>
+                  <h3 style={{
+                    fontSize: '1.1rem',
+                    color: 'var(--color-cream)',
+                    fontWeight: '600',
+                  }}>
+                    {product.name}
+                  </h3>
+                  <span style={{
+                    color: 'rgba(226, 232, 240, 0.75)',
+                    fontSize: '0.9rem',
+                    fontWeight: '500',
+                    letterSpacing: '0.3px',
+                  }}>
+                    {product.nameEn}
+                  </span>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '0.5rem',
+                  marginBottom: '1rem',
+                }}>
+                  <span style={metaBadgeStyle}>
+                    <Images size={14} />
+                    {imageCount} صور
+                  </span>
+                  <span style={metaBadgeStyle}>
+                    <List size={14} />
+                    {detailsCount} تفاصيل
+                  </span>
+                  <span style={metaBadgeStyle}>
+                    <Calendar size={14} />
+                    {formatDate(product.createdAt)}
+                  </span>
+                </div>
+
+                <p style={{
+                  color: 'var(--color-gold)',
+                  fontSize: '1rem',
+                  marginBottom: '1.25rem',
+                  fontWeight: '500',
+                }}>
+                  {product.price}
+                </p>
+
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '0.5rem',
+                }}>
+                  {/* Edit Button */}
+                  <button
+                    onClick={() => router.push(`/admin/dashboard/products/${product.id}`)}
+                    style={{
+                      padding: '0.75rem',
+                      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.1))',
+                      border: '1px solid rgba(59, 130, 246, 0.4)',
+                      borderRadius: '10px',
+                      color: '#60a5fa',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: '600',
+                      transition: 'all 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 16px rgba(59, 130, 246, 0.25)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <Edit size={16} />
+                    <span>تعديل</span>
+                  </button>
+
+                  {/* Delete Button */}
+                  <button
+                    onClick={() => setDeleteModal({ isOpen: true, product })}
+                    style={{
+                      padding: '0.75rem',
+                      background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1))',
+                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      borderRadius: '10px',
+                      color: '#f87171',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: '600',
+                      transition: 'all 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 16px rgba(239, 68, 68, 0.25)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <Trash2 size={16} />
+                    <span>حذف</span>
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {products.length === 0 && (
         <div style={{
-          textAlign: 'center',
           padding: '4rem 2rem',
           background: 'rgba(26, 20, 16, 0.4)',
           border: '2px dashed rgba(232, 199, 111, 0.3)',
           borderRadius: '16px',
+          textAlign: 'center',
         }}>
           <Package size={64} color="var(--color-gold)" style={{ marginBottom: '1rem', opacity: 0.5 }} />
           <p style={{ fontSize: '1.2rem', color: 'var(--color-light-gold)', marginBottom: '1rem' }}>

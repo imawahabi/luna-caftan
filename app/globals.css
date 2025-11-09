@@ -521,10 +521,10 @@ header nav button:hover::after {
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, 
-    rgba(10, 10, 10, 0.86) 0%, 
-    rgba(26, 20, 16, 0.78) 30%,
-    rgba(10, 10, 10, 0.82) 70%,
-    rgba(10, 10, 10, 0.86) 100%);
+    rgba(10, 10, 10, 0.66) 0%, 
+    rgba(26, 20, 16, 0.58) 30%,
+    rgba(10, 10, 10, 0.72) 70%,
+    rgba(10, 10, 10, 0.66) 100%);
 }
 
 .hero-overlay::before {
@@ -671,6 +671,7 @@ html[dir='rtl'] .hero-badge {
   -webkit-text-fill-color: transparent;
   display: block;
   font-size: 0.6em;
+  font-weight: bold;
   margin-top: 0.5rem;
   text-shadow: none;
   filter: drop-shadow(0 6px 20px rgba(232, 199, 111, 0.6)) 

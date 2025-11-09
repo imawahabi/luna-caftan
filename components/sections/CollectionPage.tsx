@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { PageType } from '@/app/page';
 import ProductCard from '@/components/ProductCard';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import ProductCardSkeleton from '@/components/ProductCardSkeleton';
 
 interface CollectionPageProps {
   navigateTo: (page: PageType, productId?: string) => void;
@@ -37,7 +37,12 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
     try {
       const res = await fetch('/api/products');
       const data = await res.json();
-      setProducts(data);
+      const normalizedProducts = Array.isArray(data) ? data : [];
+      const featuredFirst = [...normalizedProducts].sort((a, b) => {
+        if (a.featured === b.featured) return 0;
+        return a.featured ? -1 : 1;
+      });
+      setProducts(featuredFirst);
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
@@ -67,25 +72,31 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
       {/* Products */}
       <section className="section" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
         <div className="container">
-          {loading ? (
-            <LoadingSpinner message={i18n.language === 'ar' ? 'جاري تحميل القفاطين...' : 'Loading Caftans...'} />
-          ) : (
-            <div 
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
-                gap: '3rem',
-              }}
-            >
-              {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onClick={() => navigateTo('product', product.id)}
-                />
-              ))}
-            </div>
-          )}
+          <div 
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
+              gap: '3rem',
+            }}
+          >
+            {loading ? (
+              <>
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </>
+            ) : (
+              <>
+                {products.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onClick={() => navigateTo('product', product.id)}
+                  />
+                ))}
+              </>
+            )}
+          </div>
         </div>
       </section>
     </div>

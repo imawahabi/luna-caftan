@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Trash2, Edit, Eye, EyeOff, 
-  Package, Calendar, Star, Filter
+  Package, Calendar, Star, Filter,
+  Images, List
 } from 'lucide-react';
 import DeleteConfirmModal from '@/components/DeleteConfirmModal';
 import AddCaftanButton from '@/components/AddCaftanButton';
@@ -19,6 +20,8 @@ interface Product {
   featured: boolean;
   active: boolean;
   createdAt: string;
+  details: string[];
+  detailsEn: string[];
 }
 
 export default function ProductsPage() {
@@ -234,7 +237,7 @@ export default function ProductsPage() {
       }}>
         {filteredProducts.map((product) => {
           const isInactive = !product.active;
-          const cardStyle: React.CSSProperties = {
+          const cardStyle: CSSProperties = {
             background: isInactive ? 'rgba(60, 60, 60, 0.4)' : 'rgba(26, 20, 16, 0.6)',
             backdropFilter: 'blur(10px)',
             border: isInactive ? '1px solid rgba(148, 163, 184, 0.35)' : '1px solid rgba(232, 199, 111, 0.2)',
@@ -246,12 +249,29 @@ export default function ProductsPage() {
             position: 'relative',
           };
 
-          const imageStyle: React.CSSProperties = {
+          const imageStyle: CSSProperties = {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
             transform: isInactive ? 'scale(1.02)' : 'none',
             transition: 'transform 0.3s ease',
+          };
+
+          const imageCount = Array.isArray(product.images) ? product.images.length : 0;
+          const detailsCount = Array.isArray(product.details) ? product.details.length : 0;
+          const metaBadgeStyle: CSSProperties = {
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            background: 'rgba(15, 23, 42, 0.45)',
+            border: '1px solid rgba(148, 163, 184, 0.3)',
+            borderRadius: '999px',
+            padding: '0.35rem 0.75rem',
+            fontSize: '0.75rem',
+            color: 'var(--color-light-gold)',
+            lineHeight: 1,
+            letterSpacing: '0.3px',
+            backdropFilter: 'blur(8px)',
           };
 
           return (
@@ -380,14 +400,49 @@ export default function ProductsPage() {
                     pointerEvents: 'none',
                   }} />
                 )}
-                <h3 style={{
-                  fontSize: '1.1rem',
-                  color: 'var(--color-cream)',
-                  marginBottom: '0.5rem',
-                  fontWeight: '600',
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.35rem',
+                  marginBottom: '1rem',
                 }}>
-                  {product.name}
-                </h3>
+                  <h3 style={{
+                    fontSize: '1.1rem',
+                    color: 'var(--color-cream)',
+                    fontWeight: '600',
+                  }}>
+                    {product.name}
+                  </h3>
+                  <span style={{
+                    color: 'rgba(226, 232, 240, 0.75)',
+                    fontSize: '0.9rem',
+                    fontWeight: '500',
+                    letterSpacing: '0.3px',
+                  }}>
+                    {product.nameEn}
+                  </span>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '0.5rem',
+                  marginBottom: '1rem',
+                }}>
+                  <span style={metaBadgeStyle}>
+                    <Images size={14} />
+                    {imageCount} صور
+                  </span>
+                  <span style={metaBadgeStyle}>
+                    <List size={14} />
+                    {detailsCount} تفاصيل
+                  </span>
+                  <span style={metaBadgeStyle}>
+                    <Calendar size={14} />
+                    {formatDate(product.createdAt)}
+                  </span>
+                </div>
+
                 <p style={{
                   color: 'var(--color-gold)',
                   fontSize: '1rem',

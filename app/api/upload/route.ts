@@ -3,13 +3,8 @@ import { v2 as cloudinary } from 'cloudinary';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '2gb',
-    },
-  },
-};
+// Note: bodyParser config is deprecated in App Router
+// File size limits are handled by Next.js automatically
 
 // Configure Cloudinary
 cloudinary.config({
@@ -41,11 +36,10 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     const result = await new Promise<any>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_large_stream(
+      const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: 'luna-caftan',
           resource_type: 'auto',
-          chunk_size: 10_000_000,
           overwrite: false,
         },
         (error, uploadResult) => {

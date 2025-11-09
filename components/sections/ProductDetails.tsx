@@ -212,13 +212,18 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
               backgroundImage: `url(${firstImage})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              filter: 'brightness(0.3) blur(3px)',
-              transform: 'scale(1.1)',
+              filter: 'brightness(1) blur(1.8px) saturate(1.05)',
+              transform: 'scale(1.06)',
             }} />
             <div style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(180deg, rgba(10,10,10,0.7) 0%, rgba(26,20,16,0.9) 100%)',
+              background: 'radial-gradient(circle at center, rgba(232, 199, 111, 0.18) 0%, rgba(10, 10, 10, 0.6) 52%, rgba(10, 10, 10, 0.38) 100%)',
+            }} />
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(180deg, rgba(10, 10, 10, 0.47) 0%, rgba(26, 20, 16, 0.67) 100%)',
             }} />
           </>
         )}

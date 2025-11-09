@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter, usePathname } from 'next/navigation';
 import { 
   LogOut, Settings as SettingsIcon, Home as HomeIcon, 
-  Package, Plus, Menu, X
+  Package, Plus, Menu, X, Shield
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -47,6 +47,7 @@ export default function DashboardLayout({
     { icon: HomeIcon, label: 'الرئيسية', path: '/admin/dashboard', exact: true },
     { icon: Package, label: 'جميع القفاطين', path: '/admin/dashboard/products', exact: false },
     { icon: Plus, label: 'إضافة قفطان', path: '/admin/dashboard/products/new' },
+    { icon: Shield, label: 'إدارة المسؤولين', path: '/admin/dashboard/admins' },
     { icon: SettingsIcon, label: 'الإعدادات', path: '/admin/dashboard/settings' },
   ];
 
@@ -319,7 +320,39 @@ export default function DashboardLayout({
         <div style={{ 
           padding: '1rem 0.75rem',
           borderTop: '1px solid rgba(232, 199, 111, 0.15)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.75rem',
         }}>
+          <button
+            onClick={() => router.push('/')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: sidebarOpen ? '0.875rem 1rem' : '0.875rem',
+              background: 'rgba(232, 199, 111, 0.12)',
+              border: '1px solid rgba(232, 199, 111, 0.3)',
+              borderRadius: '12px',
+              color: 'var(--color-gold)',
+              cursor: 'pointer',
+              transition: 'all 0.3s',
+              fontSize: '0.95rem',
+              fontWeight: '500',
+              width: '100%',
+              justifyContent: sidebarOpen ? 'flex-start' : 'center',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(232, 199, 111, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(232, 199, 111, 0.12)';
+            }}
+          >
+            <HomeIcon size={20} />
+            {sidebarOpen && <span>زيارة الموقع</span>}
+          </button>
+
           <button
             onClick={() => signOut({ callbackUrl: '/admin/login' })}
             style={{

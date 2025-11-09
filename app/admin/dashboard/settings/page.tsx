@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Save, Globe, Phone, Mail, Instagram, 
@@ -425,6 +425,8 @@ export default function SettingsPage() {
           </button>
         </div>
       </form>
+
+      {/* إدارة المسؤولين أصبحت في صفحة مستقلة */}
     </div>
   );
 }

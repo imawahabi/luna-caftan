@@ -6,7 +6,8 @@ import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PageType } from '@/app/page';
 import ProductCard from '@/components/ProductCard';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import ProductCardSkeleton from '@/components/ProductCardSkeleton';
+import { useSettings } from '@/lib/settings-context';
 
 interface HomePageProps {
   navigateTo: (page: PageType, productId?: string) => void;
@@ -30,6 +31,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { settings } = useSettings();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -50,8 +52,12 @@ export default function HomePage({ navigateTo }: HomePageProps) {
     try {
       const res = await fetch('/api/products');
       const data = await res.json();
-      // Ensure data is always an array
-      setProducts(Array.isArray(data) ? data : []);
+      const normalizedProducts = Array.isArray(data) ? data : [];
+      const featuredFirst = [...normalizedProducts].sort((a, b) => {
+        if (a.featured === b.featured) return 0;
+        return a.featured ? -1 : 1;
+      });
+      setProducts(featuredFirst);
     } catch (error) {
       console.error('Error fetching products:', error);
       setProducts([]); // Set empty array on error
@@ -93,7 +99,10 @@ export default function HomePage({ navigateTo }: HomePageProps) {
         viewport={{ once: true, amount: 0.4 }}
       >
         <div className="hero-bg">
-          <img src="/images/hero.jpg" alt="Luna Caftan" />
+          <img
+            src={settings.hero_background_url || '/images/hero.jpg'}
+            alt="Luna Caftan"
+          />
           <div className="hero-overlay"></div>
         </div>
 
@@ -165,14 +174,27 @@ export default function HomePage({ navigateTo }: HomePageProps) {
           </div>
 
           <motion.div 
+            key={loading ? 'loading' : 'loaded'}
             className="products-grid"
             variants={sectionVariants}
             initial="hidden"
-            animate={loading ? 'hidden' : 'visible'}
+            animate="visible"
+            viewport={{ once: true, amount: 0.1 }}
           >
             {loading ? (
-              <div style={{ gridColumn: '1 / -1' }}>
-                <LoadingSpinner message={i18n.language === 'ar' ? 'جاري تحميل القفاطين...' : 'Loading Caftans...'} />
+              <>
+                {[1, 2, 3].map((i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </>
+            ) : products.length === 0 ? (
+              <div style={{ 
+                gridColumn: '1 / -1', 
+                textAlign: 'center', 
+                padding: '3rem',
+                color: 'var(--color-light-gold)' 
+              }}>
+                <p>لا توجد قفاطين متاحة حالياً</p>
               </div>
             ) : (
               <>
@@ -248,7 +270,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
                   boxShadow: '0 30px 90px rgba(0, 0, 0, 0.5)',
                 }}>
                   <img 
-                    src="/images/hero.jpg" 
+                    src={settings.about_background_url || '/images/hero.jpg'} 
                     alt="Luna Caftan"
                     style={{ 
                       width: '100%', 
@@ -353,7 +375,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
                   boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
                 }}>
                   <img 
-                    src="/images/hero.jpg" 
+                    src={settings.about_background_url || '/images/hero.jpg'} 
                     alt="Luna Caftan"
                     style={{ 
                       width: '100%', 
