@@ -111,7 +111,7 @@ export default function ProductsPage() {
 
   return (
     <div style={{
-      padding: '2rem',
+      padding: window.innerWidth < 768 ? '1rem' : '2rem',
       direction: 'rtl',
     }}>
       {/* Header */}

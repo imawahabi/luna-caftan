@@ -184,7 +184,7 @@ export default function DashboardPage() {
 
   return (
     <div style={{
-      padding: '2rem',
+      padding: window.innerWidth < 768 ? '1rem' : '2rem',
       direction: 'rtl',
     }}>
       {/* Header */}
@@ -197,12 +197,12 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '3rem',
+        gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: window.innerWidth < 768 ? '1rem' : '1.5rem',
+        marginBottom: window.innerWidth < 768 ? '2rem' : '3rem',
       }}>
         <StatCard
           title="إجمالي القفاطين"
@@ -250,8 +250,8 @@ export default function DashboardPage() {
       {/* Products Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-        gap: '1.5rem',
+        gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))',
+        gap: window.innerWidth < 768 ? '1rem' : '1.5rem',
       }}>
         {products.map((product) => {
           const isInactive = !product.active;

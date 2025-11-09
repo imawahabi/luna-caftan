@@ -100,7 +100,7 @@ export default function NewProductPage() {
 
   return (
     <div style={{
-      padding: '2rem',
+      padding: window.innerWidth < 768 ? '1rem' : '2rem',
       direction: 'rtl',
       maxWidth: '100%',
     }}>

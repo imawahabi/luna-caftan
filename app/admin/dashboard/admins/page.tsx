@@ -226,9 +226,11 @@ export default function AdminsPage() {
   };
 
   return (
-    <div style={{ 
-      padding: '2rem',
+    <div style={{
+      padding: window.innerWidth < 768 ? '1rem' : '2rem',
       direction: 'rtl',
+      maxWidth: '1400px',
+      margin: '0 auto',
     }}>
       {/* Header */}
       <div style={{ marginBottom: '2rem' }}>

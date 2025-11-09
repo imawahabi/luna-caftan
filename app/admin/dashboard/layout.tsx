@@ -19,6 +19,19 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth < 768) {
+        setSidebarOpen(false);
+      }
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -99,12 +112,12 @@ export default function DashboardLayout({
         width: sidebarOpen ? '280px' : '80px',
         height: '100vh',
         position: 'fixed',
-        right: 0,
+        right: isMobile && !sidebarOpen ? '-280px' : 0,
         top: 0,
         background: 'rgba(26, 20, 16, 0.95)',
         backdropFilter: 'blur(20px)',
         borderLeft: '1px solid rgba(232, 199, 111, 0.2)',
-        transition: 'width 0.3s ease',
+        transition: 'all 0.3s ease',
         zIndex: 1000,
         display: 'flex',
         flexDirection: 'column',
@@ -307,12 +320,14 @@ export default function DashboardLayout({
           })}
         </nav>
 
-        {/* Logout Button */}
+        {/* Action Buttons */}
         <div style={{ 
           padding: '1rem 0.75rem',
           borderTop: '1px solid rgba(232, 199, 111, 0.15)',
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: sidebarOpen ? 'row' : 'column',
+          justifyContent: sidebarOpen ? 'space-between' : 'center',
+          alignItems: 'center',
           gap: '0.75rem',
         }}>
           <button
@@ -320,18 +335,16 @@ export default function DashboardLayout({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.75rem',
-              padding: sidebarOpen ? '0.875rem 1rem' : '0.875rem',
+              justifyContent: 'center',
+              padding: '0.75rem',
               background: 'rgba(232, 199, 111, 0.12)',
               border: '1px solid rgba(232, 199, 111, 0.3)',
               borderRadius: '12px',
               color: 'var(--color-gold)',
               cursor: 'pointer',
               transition: 'all 0.3s',
-              fontSize: '0.95rem',
-              fontWeight: '500',
-              width: '100%',
-              justifyContent: sidebarOpen ? 'flex-start' : 'center',
+              width: sidebarOpen ? '50%' : '100%',
+              minWidth: '48px',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'rgba(232, 199, 111, 0.2)';
@@ -341,7 +354,6 @@ export default function DashboardLayout({
             }}
           >
             <HomeIcon size={20} />
-            {sidebarOpen && <span>زيارة الموقع</span>}
           </button>
 
           <button
@@ -349,18 +361,16 @@ export default function DashboardLayout({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.75rem',
-              padding: sidebarOpen ? '0.875rem 1rem' : '0.875rem',
+              justifyContent: 'center',
+              padding: '0.75rem',
               background: 'rgba(239, 68, 68, 0.1)',
               border: '1px solid rgba(239, 68, 68, 0.3)',
               borderRadius: '12px',
               color: '#f87171',
               cursor: 'pointer',
               transition: 'all 0.3s',
-              fontSize: '0.95rem',
-              fontWeight: '500',
-              width: '100%',
-              justifyContent: sidebarOpen ? 'flex-start' : 'center',
+              width: sidebarOpen ? '50%' : '100%',
+              minWidth: '48px',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)';
@@ -370,15 +380,28 @@ export default function DashboardLayout({
             }}
           >
             <LogOut size={20} />
-            {sidebarOpen && <span>تسجيل الخروج</span>}
           </button>
         </div>
       </aside>
 
+      {/* Overlay for mobile */}
+      {isMobile && sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 999,
+            transition: 'opacity 0.3s ease',
+          }}
+        />
+      )}
+
       {/* Main Content */}
       <main style={{
         flex: 1,
-        marginRight: sidebarOpen ? '280px' : '80px',
+        marginRight: isMobile ? 0 : (sidebarOpen ? '280px' : '80px'),
         transition: 'margin-right 0.3s ease',
         position: 'relative',
         zIndex: 1,
@@ -387,8 +410,8 @@ export default function DashboardLayout({
         {children}
       </main>
 
-      {/* Mobile Toggle Button */}
-      {!sidebarOpen && (
+      {/* Toggle Button */}
+      {(!sidebarOpen || isMobile) && (
         <button
           onClick={() => setSidebarOpen(true)}
           style={{

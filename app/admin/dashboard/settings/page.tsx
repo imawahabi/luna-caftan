@@ -39,7 +39,15 @@ const textareaStyle: React.CSSProperties = {
   fontFamily: 'inherit',
 };
 
-const SectionCard = ({ title, icon: Icon, children }: any) => (
+interface SectionCardProps {
+  title: string;
+  icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+  children: React.ReactNode;
+  fullWidth?: boolean;
+  contentStyle?: React.CSSProperties;
+}
+
+const SectionCard = ({ title, icon: Icon, children, fullWidth = false, contentStyle }: SectionCardProps) => (
   <div style={{
     background: 'rgba(26, 20, 16, 0.6)',
     backdropFilter: 'blur(10px)',
@@ -47,6 +55,7 @@ const SectionCard = ({ title, icon: Icon, children }: any) => (
     borderRadius: '20px',
     padding: '2rem',
     transition: 'all 0.3s',
+    gridColumn: fullWidth ? '1 / -1' : undefined,
   }}>
     <div style={{
       display: 'flex',
@@ -73,9 +82,60 @@ const SectionCard = ({ title, icon: Icon, children }: any) => (
         {title}
       </h3>
     </div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '1.25rem',
+      ...contentStyle,
+    }}>
       {children}
     </div>
+  </div>
+);
+
+interface ImageUploadFieldProps {
+  label: string;
+  description: string;
+  value: string;
+  onSelect: (url: string) => void;
+}
+
+const ImageUploadField = ({ label, description, value, onSelect }: ImageUploadFieldProps) => (
+  <div style={{
+    background: 'rgba(12, 9, 7, 0.6)',
+    border: '1px solid rgba(232, 199, 111, 0.2)',
+    borderRadius: '16px',
+    padding: '1.5rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+    minHeight: '100%',
+  }}>
+    <div>
+      <h4 style={{
+        color: 'var(--color-gold)',
+        fontSize: '1.05rem',
+        fontWeight: 600,
+        margin: 0,
+        marginBottom: '0.35rem',
+      }}>
+        {label}
+      </h4>
+      <p style={{
+        color: 'rgba(232, 199, 111, 0.65)',
+        fontSize: '0.85rem',
+        margin: 0,
+        lineHeight: 1.5,
+      }}>
+        {description}
+      </p>
+    </div>
+    <ImageUploader
+      currentValue={value}
+      onImageSelect={onSelect}
+      label={label}
+      showGallery
+    />
   </div>
 );
 
@@ -215,7 +275,7 @@ export default function SettingsPage() {
 
   return (
     <div style={{
-      padding: '2rem',
+      padding: window.innerWidth < 768 ? '1rem' : '2rem',
       direction: 'rtl',
       maxWidth: '100%',
     }}>
@@ -275,8 +335,8 @@ export default function SettingsPage() {
       <form onSubmit={handleSubmit}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))',
-          gap: '2rem',
+          gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(auto-fit, minmax(500px, 1fr))',
+          gap: window.innerWidth < 768 ? '1.5rem' : '2rem',
           marginBottom: '2rem',
         }}>
           {/* Contact Info */}
@@ -334,60 +394,34 @@ export default function SettingsPage() {
           </SectionCard>
 
           {/* Images Section */}
-          <SectionCard title="الصور والخلفيات" icon={ImageIcon}>
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.75rem',
-                color: 'var(--color-cream)',
-                fontSize: '0.9rem',
-                fontWeight: '500',
-              }}>
-                شعار الموقع (Logo)
-              </label>
-              <ImageUploader
-                currentValue={formData.logoUrl}
-                onImageSelect={(url) => setFormData(prev => ({ ...prev, logoUrl: url }))}
-                label="شعار الموقع"
-                showGallery={true}
-              />
-            </div>
-
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.75rem',
-                color: 'var(--color-cream)',
-                fontSize: '0.9rem',
-                fontWeight: '500',
-              }}>
-                خلفية الهيرو (Hero Background)
-              </label>
-              <ImageUploader
-                currentValue={formData.heroBackgroundUrl}
-                onImageSelect={(url) => setFormData(prev => ({ ...prev, heroBackgroundUrl: url }))}
-                label="خلفية الهيرو"
-                showGallery={true}
-              />
-            </div>
-
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.75rem',
-                color: 'var(--color-cream)',
-                fontSize: '0.9rem',
-                fontWeight: '500',
-              }}>
-                خلفية قسم "عن لونا" (About Background)
-              </label>
-              <ImageUploader
-                currentValue={formData.aboutBackgroundUrl}
-                onImageSelect={(url) => setFormData(prev => ({ ...prev, aboutBackgroundUrl: url }))}
-                label="خلفية عن لونا"
-                showGallery={true}
-              />
-            </div>
+          <SectionCard
+            title="الصور والخلفيات"
+            icon={ImageIcon}
+            fullWidth
+            contentStyle={{
+              display: 'grid',
+              gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: window.innerWidth < 768 ? '1rem' : '1.5rem',
+            }}
+          >
+            <ImageUploadField
+              label="شعار الموقع"
+              description="يظهر في جميع أقسام الموقع وفي لوحة التحكم. اختر نسخة عالية الدقة بخلفية شفافة إن وجدت."
+              value={formData.logoUrl}
+              onSelect={(url) => setFormData(prev => ({ ...prev, logoUrl: url }))}
+            />
+            <ImageUploadField
+              label="خلفية الهيرو"
+              description="صورة الخلفية الرئيسية للصفحة الرئيسية وجميع الأقسام المرتبطة بالواجهة. استخدم صورة أفقية عالية الجودة."
+              value={formData.heroBackgroundUrl}
+              onSelect={(url) => setFormData(prev => ({ ...prev, heroBackgroundUrl: url }))}
+            />
+            <ImageUploadField
+              label="خلفية قسم عن لونا"
+              description="خلفية قسم التعريف بالعلامة التجارية ضمن الصفحة الرئيسية. يفضل استخدام صورة هادئة بتباين جيد."
+              value={formData.aboutBackgroundUrl}
+              onSelect={(url) => setFormData(prev => ({ ...prev, aboutBackgroundUrl: url }))}
+            />
           </SectionCard>
         </div>
 
