@@ -38,6 +38,10 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
   const [isLiking, setIsLiking] = useState(false);
   const [hasLiked, setHasLiked] = useState(false);
 
+  // Ensure images is always an array
+  const productImages = product && Array.isArray(product.images) ? product.images : [];
+  const firstImage = productImages[0] || '';
+
   useEffect(() => {
     fetchProduct();
   }, [productId]);
@@ -200,12 +204,12 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
         paddingTop: '60px',
       }}>
         {/* Background Image */}
-        {product && product.images[0] && (
+        {firstImage && (
           <>
             <div style={{
               position: 'absolute',
               inset: 0,
-              backgroundImage: `url(${product.images[0]})`,
+              backgroundImage: `url(${firstImage})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               filter: 'brightness(0.3) blur(3px)',

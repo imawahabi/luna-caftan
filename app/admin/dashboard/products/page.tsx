@@ -34,7 +34,7 @@ export default function ProductsPage() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/products');
+      const res = await fetch('/api/products?admin=true');
       if (!res.ok) {
         throw new Error(`API error: Status ${res.status}`);
       }

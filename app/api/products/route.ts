@@ -27,10 +27,13 @@ const parseImages = (images: Product['images']) => {
   return [];
 };
 // GET all products
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const isAdmin = searchParams.get('admin') === 'true';
+    
     const products = await prisma.product.findMany({
-      where: { active: true },
+      where: isAdmin ? {} : { active: true },
       orderBy: { createdAt: 'desc' },
     });
 
