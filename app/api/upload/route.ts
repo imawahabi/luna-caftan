@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file size (max 100MB)
-    const maxSize = 100 * 2024 * 2024; // 100MB
+    const maxSize = 100 * 1024 * 1024; // 100MB
     if (file.size > maxSize) {
       return NextResponse.json(
         { error: 'حجم الملف كبير جداً. الحد الأقصى 100 ميجابايت' },
