@@ -7,6 +7,25 @@
   letter-spacing: 0 !important;
 }
 
+/* Performance optimizations */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Reduce paint and layout thrashing */
+img, video {
+  content-visibility: auto;
+}
+
+/* Optimize animations */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    will-change: auto;
+  }
+}
+
 /* تحسينات الأداء */
 img {
   image-rendering: -webkit-optimize-contrast;
@@ -48,8 +67,29 @@ button, a {
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  scroll-padding-top: 80px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth scrolling with better performance */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 body {
@@ -1632,9 +1672,11 @@ footer::after {
   border-radius: 12px;
   color: var(--color-gold);
   cursor: pointer;
-  padding: 0.6rem 0.6rem 0.4rem 0.6rem; /* إزالة padding من الأسفل */
+  padding: 0.6rem; /* Uniform padding for perfect centering */
   transition: all 0.3s;
   backdrop-filter: blur(10px);
+  align-items: center;
+  justify-content: center;
 }
 
 .mobile-menu-btn:hover {
@@ -1751,7 +1793,7 @@ footer::after {
   }
   
   .mobile-menu-btn {
-    display: block;
+    display: flex;
   }
   
   .hero {

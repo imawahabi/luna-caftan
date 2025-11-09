@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { PageType } from '@/app/page';
 import ProductCard from '@/components/ProductCard';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface CollectionPageProps {
   navigateTo: (page: PageType, productId?: string) => void;
@@ -66,21 +67,25 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
       {/* Products */}
       <section className="section" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
         <div className="container">
-          <div 
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
-              gap: '3rem',
-            }}
-          >
-            {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onClick={() => navigateTo('product', product.id)}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <LoadingSpinner message={i18n.language === 'ar' ? 'جاري تحميل القفاطين...' : 'Loading Caftans...'} />
+          ) : (
+            <div 
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))',
+                gap: '3rem',
+              }}
+            >
+              {products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onClick={() => navigateTo('product', product.id)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

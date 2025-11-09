@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, ArrowLeft, MessageCircle } from 'lucide-react';
+import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PageType } from '@/app/page';
 import ProductCard from '@/components/ProductCard';
@@ -50,9 +50,11 @@ export default function HomePage({ navigateTo }: HomePageProps) {
     try {
       const res = await fetch('/api/products');
       const data = await res.json();
-      setProducts(data);
+      // Ensure data is always an array
+      setProducts(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching products:', error);
+      setProducts([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -129,7 +131,9 @@ export default function HomePage({ navigateTo }: HomePageProps) {
                 rel="noopener noreferrer"
                 className="btn btn-outline"
               >
-                <MessageCircle size={20} />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
                 <span>{i18n.language === 'ar' ? 'تواصلي معنا' : 'Contact Us'}</span>
               </a>
             </div>
@@ -147,7 +151,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
         variants={sectionVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.1 }}
+        viewport={{ once: true, amount: isMobile ? 0.05 : 0.1 }}
       >
         <div className="container">
           <div className="section-header">
@@ -207,7 +211,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
         variants={sectionVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: isMobile ? 0.05 : 0.2 }}
       >
         <div className="container">
           <div className="section-header" style={{ marginBottom: '4rem' }}>
@@ -216,36 +220,114 @@ export default function HomePage({ navigateTo }: HomePageProps) {
           </div>
 
           <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
-            gap: '4rem', 
-            alignItems: 'center' 
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+            gap: '5rem',
+            alignItems: 'center'
           }}>
+            {/* Elegant Image Section */}
             {!isMobile && (
-              <div style={{ 
-                position: 'relative',
-                borderRadius: '20px',
-                overflow: 'hidden',
-                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
-              }}>
-                <img 
-                  src="/images/about.jpg" 
-                  alt="About Luna Caftan"
-                  style={{ 
-                    width: '100%', 
-                    height: '550px', 
-                    objectFit: 'cover',
-                    display: 'block'
-                  }}
-                />
+              <motion.div
+                style={{
+                  position: 'relative',
+                  height: '400px',
+                }}
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+              >
+                {/* Main Image */}
+                <div style={{
+                  position: 'relative',
+                  height: '100%',
+                  borderRadius: '0',
+                  overflow: 'hidden',
+                  boxShadow: '0 30px 90px rgba(0, 0, 0, 0.5)',
+                }}>
+                  <img 
+                    src="/images/hero.jpg" 
+                    alt="Luna Caftan"
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover',
+                      filter: 'brightness(1) contrast(1.1)',
+                    }} 
+                  />
+                  
+                  {/* Elegant Overlay */}
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                  }} />
+                  
+                  {/* Golden Frame - Top */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '1px',
+                    background: 'linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%)',
+                  }} />
+                  
+                  {/* Golden Frame - Bottom */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: '1px',
+                    background: 'linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%)',
+                  }} />
+                  
+                  {/* Golden Frame - Left */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    width: '1px',
+                    background: 'linear-gradient(180deg, transparent 0%, var(--color-gold) 50%, transparent 100%)',
+                  }} />
+                  
+                  {/* Golden Frame - Right */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                    width: '1px',
+                    background: 'linear-gradient(180deg, transparent 0%, var(--color-gold) 50%, transparent 100%)',
+                  }} />
+                </div>
+                
+                {/* Decorative Corner Accent */}
                 <div style={{
                   position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%)',
-                  border: '2px solid rgba(232, 199, 111, 0.2)',
-                  borderRadius: '20px',
-                }}></div>
-              </div>
+                  top: '-10px',
+                  left: '-10px',
+                  width: '80px',
+                  height: '80px',
+                  border: '2px solid var(--color-gold)',
+                  borderRight: 'none',
+                  borderBottom: 'none',
+                  opacity: 0.6,
+                }} />
+                
+                <div style={{
+                  position: 'absolute',
+                  bottom: '-10px',
+                  right: '-10px',
+                  width: '80px',
+                  height: '80px',
+                  border: '2px solid var(--color-gold)',
+                  borderLeft: 'none',
+                  borderTop: 'none',
+                  opacity: 0.6,
+                }} />
+              </motion.div>
             )}
             
             <div style={{ 
@@ -255,40 +337,59 @@ export default function HomePage({ navigateTo }: HomePageProps) {
               flexDirection: 'column',
               gap: '2rem'
             }}>
-              <p style={{ 
-                fontSize: '1.15rem', 
-                lineHeight: '2', 
-                color: 'var(--color-light-gold)'
-              }}>
-                {i18n.language === 'ar'
-                  ? 'منذ إطلاق بوتيك لونا أونلاين في أكتوبر 2025، أصبح كل قفطان قصيدة فاخرة تنسج في فاس خصيصاً لأذواق الجميع، مع عناية استثنائية بالتفاصيل وخامات لا تضاهى.'
-                  : 'Since Luna Boutique launched online in October 2025, every caftan has become a luxurious ode woven in Fes for the refined taste of women in Kuwait, crafted with exceptional detail and unrivaled materials.'}
-              </p>
-
+              {/* Elegant Quote */}
               <div style={{
-                padding: '2rem',
-                background: 'rgba(232, 199, 111, 0.05)',
-                border: '2px solid rgba(232, 199, 111, 0.2)',
-                borderRadius: '15px',
-                backdropFilter: 'blur(10px)',
+                borderLeft: isRTL ? 'none' : '3px solid var(--color-gold)',
+                borderRight: isRTL ? '3px solid var(--color-gold)' : 'none',
+                paddingLeft: isRTL ? '0' : '2rem',
+                paddingRight: isRTL ? '2rem' : '0',
+                marginBottom: '1rem',
               }}>
                 <p style={{ 
-                  fontSize: '1.3rem',
-                  fontWeight: '600',
-                  color: 'var(--color-gold)',
-                  marginBottom: '0.5rem',
-                  textAlign: 'center'
+                  fontSize: '1.25rem', 
+                  lineHeight: '1.9', 
+                  color: 'var(--color-cream)',
+                  fontWeight: '300',
+                  fontStyle: 'italic',
                 }}>
-                  {i18n.language === 'ar' ? 'نعيمه لبرينيه · أم راكان' : 'Naima Labrinia · Om Rakan'}
+                  {i18n.language === 'ar'
+                    ? 'منذ إطلاق بوتيك لونا أونلاين في أكتوبر 2025، أصبح كل قفطان قصيدة فاخرة تنسج في فاس خصيصاً لأذواق الجميع، مع عناية استثنائية بالتفاصيل وخامات لا تضاهى.'
+                    : 'Since Luna Boutique launched online in October 2025, every caftan has become a luxurious ode woven in Fes for the refined taste of women in Kuwait, crafted with exceptional detail and unrivaled materials.'}
                 </p>
-                <p style={{
-                  fontSize: '0.95rem',
-                  color: 'var(--color-light-gold)',
-                  textAlign: 'center',
-                  opacity: 0.9
-                }}>
-                  {i18n.language === 'ar' ? 'مؤسسة بوتيك لونا' : 'Founder of Luna Boutique'}
-                </p>
+              </div>
+
+              {/* Founder Signature */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                padding: '1.5rem 0',
+                borderTop: '1px solid rgba(232, 199, 111, 0.2)',
+                borderBottom: '1px solid rgba(232, 199, 111, 0.2)',
+              }}>
+                <div style={{
+                  width: '4px',
+                  height: '50px',
+                  background: 'linear-gradient(180deg, var(--color-gold), transparent)',
+                }} />
+                <div>
+                  <p style={{ 
+                    fontSize: '1.1rem',
+                    fontWeight: '600',
+                    color: 'var(--color-gold)',
+                    marginBottom: '0.3rem',
+                    letterSpacing: '0.5px',
+                  }}>
+                    {i18n.language === 'ar' ? 'نعيمه لبرينيه · أم راكان' : 'Naima Labrinia · Om Rakan'}
+                  </p>
+                  <p style={{
+                    fontSize: '0.9rem',
+                    color: 'var(--color-light-gold)',
+                    opacity: 0.8,
+                  }}>
+                    {i18n.language === 'ar' ? 'مؤسسة بوتيك لونا' : 'Founder of Luna Boutique'}
+                  </p>
+                </div>
               </div>
 
               <button 

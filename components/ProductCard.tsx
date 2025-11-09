@@ -29,7 +29,12 @@ export default function ProductCard({ product, onClick, variants }: ProductCardP
   
   // Ensure images is always an array
   const images = Array.isArray(product.images) ? product.images : [];
-  const firstImage = images[0] || '/placeholder.jpg';
+  const firstImage = images[0] || '/images/hero.jpg'; // Fallback to hero image
+  
+  // Debug log
+  if (!images[0]) {
+    console.warn('Product missing image:', product.name, product.images);
+  }
 
   return (
     <motion.button
@@ -52,8 +57,14 @@ export default function ProductCard({ product, onClick, variants }: ProductCardP
         boxShadow: '0 10px 40px rgba(232, 199, 111, 0.3), inset 0 0 60px rgba(232, 199, 111, 0.05)',
       }}
       dir={isRTL ? 'rtl' : 'ltr'}
-      whileHover={{ y: -16, scale: 1.02, boxShadow: '0 24px 60px rgba(232, 199, 111, 0.5), inset 0 0 80px rgba(232, 199, 111, 0.08)' }}
+      whileHover={{ 
+        y: -16, 
+        scale: 1.02, 
+        boxShadow: '0 24px 60px rgba(232, 199, 111, 0.5), inset 0 0 80px rgba(232, 199, 111, 0.08)',
+        transition: { duration: 0.3, ease: 'easeOut' }
+      }}
       whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.3 }}
     >
       {/* Image Container */}
       <div style={{ 

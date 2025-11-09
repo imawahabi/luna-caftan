@@ -379,12 +379,12 @@ export default function SettingsPage() {
                 fontSize: '0.9rem',
                 fontWeight: '500',
               }}>
-                خلفية قسم "من نحن" (About Background)
+                خلفية قسم "عن لونا" (About Background)
               </label>
               <ImageUploader
                 currentValue={formData.aboutBackgroundUrl}
                 onImageSelect={(url) => setFormData(prev => ({ ...prev, aboutBackgroundUrl: url }))}
-                label="خلفية من نحن"
+                label="خلفية عن لونا"
                 showGallery={true}
               />
             </div>
