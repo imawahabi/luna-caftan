@@ -414,12 +414,33 @@ header nav button:hover::after {
   position: relative;
   padding-top: 85px;
   overflow: hidden;
+  background-image: url('/images/hero.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 @media (max-width: 768px) {
   .hero {
     min-height: 90vh;
     padding-top: 70px;
+    background-image: url('/images/hero.jpg');
+  }
+
+  .hero-bg {
+    display: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg,
+      rgba(10, 10, 10, 0.86) 0%,
+      rgba(26, 20, 16, 0.78) 30%,
+      rgba(10, 10, 10, 0.82) 70%,
+      rgba(10, 10, 10, 0.86) 100%);
+    z-index: 1;
   }
 }
 
