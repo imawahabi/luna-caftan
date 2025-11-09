@@ -22,6 +22,7 @@ export async function GET() {
       ...product,
       details: JSON.parse(product.details),
       detailsEn: JSON.parse(product.detailsEn),
+      images: JSON.parse(product.images || '[]'),
     }));
 
     return NextResponse.json(parsedProducts);
