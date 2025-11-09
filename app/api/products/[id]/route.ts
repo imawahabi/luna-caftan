@@ -3,6 +3,22 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
+const parseImages = (images: any) => {
+  if (Array.isArray(images)) return images;
+  if (typeof images === 'string') {
+    try {
+      const parsed = JSON.parse(images);
+      if (Array.isArray(parsed)) return parsed;
+      if (typeof parsed === 'string') return [parsed];
+    } catch (error) {
+      if (images.trim().length > 0) {
+        return [images];
+      }
+    }
+  }
+  return [];
+};
+
 // GET single product
 export async function GET(
   request: Request,
@@ -25,7 +41,7 @@ export async function GET(
       ...product,
       details: JSON.parse(product.details),
       detailsEn: JSON.parse(product.detailsEn),
-      images: JSON.parse(product.images),
+      images: parseImages(product.images),
     });
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -94,7 +110,7 @@ export async function PUT(
       ...product,
       details: JSON.parse(product.details),
       detailsEn: JSON.parse(product.detailsEn),
-      images: JSON.parse(product.images),
+      images: parseImages(product.images),
     });
   } catch (error) {
     console.error('Error updating product:', error);
