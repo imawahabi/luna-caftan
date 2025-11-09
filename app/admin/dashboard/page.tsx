@@ -40,7 +40,7 @@ export default function DashboardPage() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/products');
+      const res = await fetch('/api/products?admin=true');
       const data = await res.json();
       setProducts(data);
       
