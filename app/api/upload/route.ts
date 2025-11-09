@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { v2 as cloudinary } from 'cloudinary';
+
+// Configure Cloudinary
+cloudinary.config({
+  cloudinary_url: process.env.CLOUDINARY_URL
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,28 +39,24 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create unique filename
-    const timestamp = Date.now();
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const filename = `${timestamp}-${originalName}`;
-    
-    // Ensure uploads directory exists
-    const uploadsDir = join(process.cwd(), 'public', 'uploads');
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true });
-    }
+    // Convert buffer to base64
+    const base64 = buffer.toString('base64');
+    const dataURI = `data:${file.type};base64,${base64}`;
 
-    // Save file
-    const filepath = join(uploadsDir, filename);
-    await writeFile(filepath, buffer);
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(dataURI, {
+      folder: 'luna-caftan',
+      resource_type: 'auto',
+      transformation: [
+        { width: 1200, height: 1600, crop: 'limit', quality: 'auto:good' }
+      ]
+    });
 
-    // Return public URL
-    const publicUrl = `/uploads/${filename}`;
-
+    // Return the Cloudinary URL
     return NextResponse.json({
       success: true,
-      url: publicUrl,
-      filename: filename,
+      url: result.secure_url,
+      filename: result.original_filename,
       size: file.size,
       type: file.type,
     });
@@ -71,36 +70,21 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Get list of uploaded images
+// Get list of uploaded images from Cloudinary
 export async function GET() {
   try {
-    const { readdir, stat } = await import('fs/promises');
-    const uploadsDir = join(process.cwd(), 'public', 'uploads');
-    
-    if (!existsSync(uploadsDir)) {
-      return NextResponse.json({ images: [] });
-    }
+    const result = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'luna-caftan/',
+      max_results: 500,
+    });
 
-    const files = await readdir(uploadsDir);
-    const imageFiles = files.filter(file => 
-      /\.(jpg|jpeg|png|webp|gif)$/i.test(file)
-    );
-
-    const images = await Promise.all(
-      imageFiles.map(async (file) => {
-        const filepath = join(uploadsDir, file);
-        const stats = await stat(filepath);
-        return {
-          filename: file,
-          url: `/uploads/${file}`,
-          size: stats.size,
-          createdAt: stats.birthtime,
-        };
-      })
-    );
-
-    // Sort by creation date (newest first)
-    images.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    const images = result.resources.map((resource: any) => ({
+      filename: resource.public_id,
+      url: resource.secure_url,
+      size: resource.bytes,
+      createdAt: resource.created_at,
+    }));
 
     return NextResponse.json({ images });
   } catch (error) {
@@ -109,30 +93,20 @@ export async function GET() {
   }
 }
 
-// Delete uploaded image
+// Delete uploaded image from Cloudinary
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const filename = searchParams.get('filename');
+    const publicId = searchParams.get('publicId');
 
-    if (!filename) {
+    if (!publicId) {
       return NextResponse.json(
-        { error: 'اسم الملف مطلوب' },
+        { error: 'معرف الصورة مطلوب' },
         { status: 400 }
       );
     }
 
-    const { unlink } = await import('fs/promises');
-    const filepath = join(process.cwd(), 'public', 'uploads', filename);
-
-    if (!existsSync(filepath)) {
-      return NextResponse.json(
-        { error: 'الملف غير موجود' },
-        { status: 404 }
-      );
-    }
-
-    await unlink(filepath);
+    await cloudinary.uploader.destroy(publicId);
 
     return NextResponse.json({
       success: true,
