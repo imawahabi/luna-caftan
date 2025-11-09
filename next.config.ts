@@ -17,13 +17,6 @@ const nextConfig: NextConfig = {
   
   // Compress responses
   compress: true,
-  
-  // Reduce bundle size
-  modularizeImports: {
-    'lucide-react': {
-      transform: 'lucide-react/dist/esm/icons/{{member}}',
-    },
-  },
 };
 
 export default nextConfig;
