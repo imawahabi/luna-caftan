@@ -131,6 +131,11 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
             </button>
           </nav>
 
+          {/* Mobile Language Toggle */}
+          <button onClick={toggleLanguage} className="lang-toggle mobile-lang-toggle">
+            {language === 'en' ? 'العربية' : 'EN'}
+          </button>
+
           {/* Mobile Menu Button */}
           <button onClick={toggleMobileMenu} className="mobile-menu-btn">
             {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -149,10 +154,6 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
           <button onClick={() => handleNavClick('about')}>{t('nav.about')}</button>
           <button onClick={() => handleNavClick('collection')}>{t('nav.collection')}</button>
           <button onClick={() => handleNavClick('contact')}>{t('nav.contact')}</button>
-          
-          <button onClick={() => { toggleLanguage(); closeMobileMenu(); }} className="lang-toggle" style={{ marginTop: '1rem' }}>
-            {language === 'en' ? 'العربية' : 'EN'}
-          </button>
         </nav>
       </div>
     </>

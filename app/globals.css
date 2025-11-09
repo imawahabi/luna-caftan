@@ -875,6 +875,12 @@ html[dir='rtl'] .hero-badge {
   padding: 8rem 0;
   position: relative;
   overflow: hidden;
+  background: 
+    linear-gradient(180deg, 
+      rgba(10, 10, 10, 0.95) 0%, 
+      rgba(26, 20, 16, 0.92) 50%, 
+      rgba(10, 10, 10, 0.95) 100%
+    );
 }
 
 .section::before {
@@ -1626,7 +1632,7 @@ footer::after {
   border-radius: 12px;
   color: var(--color-gold);
   cursor: pointer;
-  padding: 0.6rem;
+  padding: 0.6rem 0.6rem 0.4rem 0.6rem; /* إزالة padding من الأسفل */
   transition: all 0.3s;
   backdrop-filter: blur(10px);
 }
@@ -1635,6 +1641,21 @@ footer::after {
   background: rgba(232, 199, 111, 0.15);
   border-color: rgba(232, 199, 111, 0.5);
   transform: scale(1.05);
+}
+
+/* Mobile Language Toggle - visible only on mobile */
+.mobile-lang-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-lang-toggle {
+    display: flex;
+  }
+  
+  header nav .lang-toggle {
+    display: none !important;
+  }
 }
 
 .mobile-menu {
