@@ -122,7 +122,7 @@ export default function ImageUploader({
     } catch (err) {
       const message = err instanceof Error ? err.message : 'حدث خطأ أثناء رفع الصورة';
       if (message.includes('Request Entity Too Large') || message.includes('413')) {
-        setError('حجم الصورة أكبر من الحد المسموح. يرجى اختيار صورة أقل من 100 ميغابايت.');
+        setError('الخادم رفض الصورة بسبب الحجم أو الأبعاد. حاول تقليل الحجم أو استخدام صورة مختلفة.');
       } else if (message.toLowerCase().includes('unexpected token')) {
         setError('استجابة غير متوقعة من الخادم. يرجى المحاولة لاحقاً أو رفع صورة أصغر.');
       } else if (message.toLowerCase().includes('timeout')) {

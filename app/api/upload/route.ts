@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '2gb',
+    },
+  },
+};
+
 // Configure Cloudinary
 cloudinary.config({
   cloudinary_url: process.env.CLOUDINARY_URL
@@ -27,29 +37,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file size (max 100MB)
-    const maxSize = 100 * 1024 * 1024; // 100MB
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { error: 'حجم الملف كبير جداً. الحد الأقصى 100 ميجابايت' },
-        { status: 400 }
-      );
-    }
-
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Convert buffer to base64
-    const base64 = buffer.toString('base64');
-    const dataURI = `data:${file.type};base64,${base64}`;
+    const result = await new Promise<any>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_large_stream(
+        {
+          folder: 'luna-caftan',
+          resource_type: 'auto',
+          chunk_size: 10_000_000,
+          overwrite: false,
+        },
+        (error, uploadResult) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(uploadResult);
+          }
+        }
+      );
 
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(dataURI, {
-      folder: 'luna-caftan',
-      resource_type: 'auto',
-      transformation: [
-        { width: 1200, height: 1600, crop: 'limit', quality: 'auto:good' }
-      ]
+      uploadStream.end(buffer);
     });
 
     // Return the Cloudinary URL
@@ -61,11 +69,27 @@ export async function POST(request: NextRequest) {
       type: file.type,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Upload error:', error);
+
+    const cloudinaryMessage: string | undefined = error?.message || error?.error?.message;
+    const httpStatus: number = error?.http_code || 500;
+
+    let clientMessage = 'فشل رفع الصورة';
+
+    if (cloudinaryMessage) {
+      if (cloudinaryMessage.includes('File size too large')) {
+        clientMessage = 'حجم الصورة يتجاوز الحد المسموح به على الخادم. يرجى تقليل الحجم أو الأبعاد.';
+      } else if (cloudinaryMessage.toLowerCase().includes('invalid image')) {
+        clientMessage = 'نوع الصورة غير صالح أو تالف. يرجى اختيار صورة صحيحة.';
+      } else if (cloudinaryMessage.toLowerCase().includes('timeout')) {
+        clientMessage = 'انتهت مهلة الاتصال أثناء الرفع. يرجى المحاولة مرة أخرى.';
+      }
+    }
+
     return NextResponse.json(
-      { error: 'فشل رفع الصورة' },
-      { status: 500 }
+      { error: clientMessage, details: cloudinaryMessage },
+      { status: httpStatus }
     );
   }
 }
@@ -75,7 +99,7 @@ export async function GET() {
   try {
     const result = await cloudinary.api.resources({
       type: 'upload',
-      prefix: 'luna-caftan/',
+      prefix: 'luna-caftan/products',
       max_results: 500,
     });
 
