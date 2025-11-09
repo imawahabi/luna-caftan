@@ -167,6 +167,8 @@ export default function HomePage({ navigateTo }: HomePageProps) {
           <motion.div 
             className="products-grid"
             variants={sectionVariants}
+            initial="hidden"
+            animate={loading ? 'hidden' : 'visible'}
           >
             {loading ? (
               <div style={{ gridColumn: '1 / -1' }}>
