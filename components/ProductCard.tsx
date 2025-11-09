@@ -26,6 +26,10 @@ export default function ProductCard({ product, onClick, variants }: ProductCardP
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const hasPrice = product.price && product.price.trim() !== '';
+  
+  // Ensure images is always an array
+  const images = Array.isArray(product.images) ? product.images : [];
+  const firstImage = images[0] || '/placeholder.jpg';
 
   return (
     <motion.button
@@ -59,7 +63,7 @@ export default function ProductCard({ product, onClick, variants }: ProductCardP
         borderRadius: '24px 24px 0 0',
       }}>
         <motion.img 
-          src={product.images[0]} 
+          src={firstImage} 
           alt={i18n.language === 'ar' ? product.name : product.nameEn} 
           loading="lazy"
           style={{
