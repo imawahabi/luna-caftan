@@ -7,8 +7,25 @@ interface Product {
   name: string;
   details: string;
   detailsEn: string;
+  images?: string | string[] | null;
   [key: string]: any;
 }
+
+const parseImages = (images: Product['images']) => {
+  if (Array.isArray(images)) return images;
+  if (typeof images === 'string') {
+    try {
+      const parsed = JSON.parse(images);
+      if (Array.isArray(parsed)) return parsed;
+      if (typeof parsed === 'string') return [parsed];
+    } catch (error) {
+      if (images.trim().length > 0) {
+        return [images];
+      }
+    }
+  }
+  return [];
+};
 // GET all products
 export async function GET() {
   try {
@@ -22,7 +39,7 @@ export async function GET() {
       ...product,
       details: JSON.parse(product.details),
       detailsEn: JSON.parse(product.detailsEn),
-      images: JSON.parse(product.images || '[]'),
+      images: parseImages(product.images),
     }));
 
     return NextResponse.json(parsedProducts);
@@ -88,7 +105,7 @@ export async function POST(request: Request) {
       ...product,
       details: JSON.parse(product.details),
       detailsEn: JSON.parse(product.detailsEn),
-      images: JSON.parse(product.images),
+      images: parseImages(product.images),
     });
   } catch (error) {
     console.error('Error creating product:', error);
