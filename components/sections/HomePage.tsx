@@ -151,7 +151,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
         variants={sectionVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: isMobile ? 0.05 : 0.1 }}
+        viewport={{ once: true, amount: isMobile ? 0.01 : 0.1 }}
       >
         <div className="container">
           <div className="section-header">
@@ -211,7 +211,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
         variants={sectionVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: isMobile ? 0.05 : 0.2 }}
+        viewport={{ once: true, amount: isMobile ? 0.01 : 0.2 }}
       >
         <div className="container">
           <div className="section-header" style={{ marginBottom: '4rem' }}>
@@ -327,6 +327,58 @@ export default function HomePage({ navigateTo }: HomePageProps) {
                   borderTop: 'none',
                   opacity: 0.6,
                 }} />
+              </motion.div>
+            )}
+            
+            {/* Mobile Image Section */}
+            {isMobile && (
+              <motion.div
+                style={{
+                  position: 'relative',
+                  height: '250px',
+                  marginBottom: '2rem',
+                }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <div style={{
+                  position: 'relative',
+                  height: '100%',
+                  borderRadius: '0',
+                  overflow: 'hidden',
+                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+                }}>
+                  <img 
+                    src="/images/hero.jpg" 
+                    alt="Luna Caftan"
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover',
+                      filter: 'brightness(1) contrast(1.1)',
+                    }} 
+                  />
+                  
+                  {/* Golden Frame - Mobile */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '1px',
+                    background: 'linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%)',
+                  }} />
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: '1px',
+                    background: 'linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%)',
+                  }} />
+                </div>
               </motion.div>
             )}
             
