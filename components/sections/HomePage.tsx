@@ -6,6 +6,7 @@ import { ArrowRight, ArrowLeft, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PageType } from '@/app/page';
 import ProductCard from '@/components/ProductCard';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface HomePageProps {
   navigateTo: (page: PageType, productId?: string) => void;
@@ -146,7 +147,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
         variants={sectionVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.1 }}
       >
         <div className="container">
           <div className="section-header">
@@ -164,9 +165,9 @@ export default function HomePage({ navigateTo }: HomePageProps) {
             variants={sectionVariants}
           >
             {loading ? (
-              <p style={{ color: 'var(--color-gold)', textAlign: 'center', gridColumn: '1 / -1' }}>
-                {i18n.language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
-              </p>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <LoadingSpinner message={i18n.language === 'ar' ? 'جاري تحميل القفاطين...' : 'Loading Caftans...'} />
+              </div>
             ) : (
               <>
                 {products.slice(0, 3).map((product) => (
