@@ -97,13 +97,14 @@ export async function POST(request: NextRequest) {
 // Get list of uploaded images from Cloudinary
 export async function GET() {
   try {
-    const result = await cloudinary.api.resources({
-      type: 'upload',
-      prefix: 'luna-caftan/products',
-      max_results: 500,
-    });
+    const result = await cloudinary.search
+      .expression('folder="luna-caftan/products"')
+      .sort_by('created_at', 'desc')
+      .with_field('context')
+      .max_results(200)
+      .execute();
 
-    const images = result.resources.map((resource: any) => ({
+    const images = (result.resources || []).map((resource: any) => ({
       filename: resource.public_id,
       url: resource.secure_url,
       size: resource.bytes,

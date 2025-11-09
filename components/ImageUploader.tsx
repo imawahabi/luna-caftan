@@ -108,7 +108,8 @@ export default function ImageUploader({
       }
 
       if (!res.ok) {
-        throw new Error(data?.error || 'فشل رفع الصورة');
+        const detail = data?.details ? `\n(${data.details})` : '';
+        throw new Error((data?.error || 'فشل رفع الصورة') + detail);
       }
 
       if (!data?.url) {
