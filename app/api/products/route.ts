@@ -2,7 +2,13 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-
+interface Product {
+  id: string;
+  name: string;
+  details: string;
+  detailsEn: string;
+  [key: string]: any;
+}
 // GET all products
 export async function GET() {
   try {
@@ -12,11 +18,10 @@ export async function GET() {
     });
 
     // Parse JSON strings back to arrays
-    const parsedProducts = products.map((product: any) => ({
+    const parsedProducts = products.map((product: Product) => ({
       ...product,
       details: JSON.parse(product.details),
       detailsEn: JSON.parse(product.detailsEn),
-      images: JSON.parse(product.images),
     }));
 
     return NextResponse.json(parsedProducts);
