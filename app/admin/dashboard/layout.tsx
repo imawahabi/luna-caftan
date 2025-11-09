@@ -8,6 +8,7 @@ import {
   Package, Plus, Menu, X, Shield
 } from 'lucide-react';
 import Image from 'next/image';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function DashboardLayout({
   children,
@@ -26,17 +27,7 @@ export default function DashboardLayout({
   }, [status, router]);
 
   if (status === 'loading') {
-    return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#0a0a0a',
-      }}>
-        <p style={{ color: 'var(--color-gold)', fontSize: '1.5rem' }}>جاري التحميل...</p>
-      </div>
-    );
+    return <LoadingSpinner message="جاري التحميل..." fullScreen />;
   }
 
   if (!session) {

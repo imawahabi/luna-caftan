@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import DeleteConfirmModal from '@/components/DeleteConfirmModal';
 import AddCaftanButton from '@/components/AddCaftanButton';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface Product {
   id: string;
@@ -95,16 +96,7 @@ export default function ProductsPage() {
   });
 
   if (loading) {
-    return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        <p style={{ color: 'var(--color-gold)', fontSize: '1.5rem' }}>جاري التحميل...</p>
-      </div>
-    );
+    return <LoadingSpinner message="جاري تحميل القفاطين..." fullScreen />;
   }
 
   const formatDate = (dateString: string) => {

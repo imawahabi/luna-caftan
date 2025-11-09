@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowRight, Plus, X, Save, Upload, Image as ImageIcon, Star, Edit as EditIcon, Eye, EyeOff } from 'lucide-react';
 import ImageUploader from '@/components/ImageUploader';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -134,46 +135,7 @@ export default function EditProductPage() {
   };
 
   if (fetching) {
-    return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-      }}>
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 0,
-          overflow: 'hidden',
-          backgroundColor: '#0a0a0a',
-        }}>
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundImage: "url('/images/admin-bg.png')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'brightness(0.45) contrast(1.05)',
-              transform: 'scale(1.08)',
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(135deg, rgba(10,10,10,0.88) 0%, rgba(26,20,16,0.8) 32%, rgba(10,10,10,0.86) 68%, rgba(10,10,10,0.92) 100%)',
-            }}
-          />
-        </div>
-        <p style={{ color: 'var(--color-gold)', fontSize: '1.5rem', position: 'relative', zIndex: 1 }}>جاري التحميل...</p>
-      </div>
-    );
+    return <LoadingSpinner message="جاري تحميل بيانات القفطان..." fullScreen />;
   }
 
   return (

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Check, ArrowRight, ZoomIn, Share2, Heart, ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { PageType } from '@/app/page';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface Product {
   id: string;
@@ -37,6 +38,10 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
   const [likesCount, setLikesCount] = useState(0);
   const [isLiking, setIsLiking] = useState(false);
   const [hasLiked, setHasLiked] = useState(false);
+  const [zoomScale, setZoomScale] = useState(1);
+  const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+  const [initialPinchDistance, setInitialPinchDistance] = useState<number | null>(null);
 
   // Ensure images is always an array
   const productImages = product && Array.isArray(product.images) ? product.images : [];
@@ -110,25 +115,83 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setMousePosition({ x, y });
+    if (window.innerWidth > 768) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setMousePosition({ x, y });
+    }
+  };
+
+  const getPinchDistance = (touches: React.TouchList) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 1) {
+      setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+    } else if (e.touches.length === 2) {
+      const distance = getPinchDistance(e.touches);
+      setInitialPinchDistance(distance);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2 && initialPinchDistance) {
+      // Pinch to zoom
+      const currentDistance = getPinchDistance(e.touches);
+      const scale = Math.max(1, Math.min(3, (currentDistance / initialPinchDistance) * zoomScale));
+      setZoomScale(scale);
+      setImageZoomed(scale > 1);
+    } else if (e.touches.length === 1 && touchStart && zoomScale > 1) {
+      // Pan when zoomed
+      const deltaX = e.touches[0].clientX - touchStart.x;
+      const deltaY = e.touches[0].clientY - touchStart.y;
+      setPanPosition({
+        x: panPosition.x + deltaX,
+        y: panPosition.y + deltaY,
+      });
+      setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 0) {
+      setTouchStart(null);
+      setInitialPinchDistance(null);
+      // Reset if zoom is minimal
+      if (zoomScale < 1.1) {
+        setZoomScale(1);
+        setPanPosition({ x: 0, y: 0 });
+        setImageZoomed(false);
+      }
+    }
+  };
+
+  const handleImageClick = () => {
+    if (window.innerWidth > 768) {
+      setImageZoomed(!imageZoomed);
+    } else {
+      // On mobile, toggle between 1x and 2x zoom
+      if (zoomScale === 1) {
+        setZoomScale(2);
+        setImageZoomed(true);
+      } else {
+        setZoomScale(1);
+        setPanPosition({ x: 0, y: 0 });
+        setImageZoomed(false);
+      }
+    }
   };
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(180deg, #0a0a0a 0%, #1a1410 100%)',
-      }}>
-        <p style={{ color: 'var(--color-gold)', fontSize: '1.5rem' }}>
-          {i18n.language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
-        </p>
-      </div>
+      <LoadingSpinner 
+        message={i18n.language === 'ar' ? 'جاري تحميل القفطان...' : 'Loading caftan...'} 
+        fullScreen 
+      />
     );
   }
 
@@ -381,7 +444,7 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
                   height: window.innerWidth > 768 ? '650px' : '500px', 
                   marginBottom: '2rem',
                   borderRadius: '24px',
-                  overflow: 'hidden',
+                  overflow: imageZoomed ? 'hidden' : 'hidden',
                   border: '3px solid transparent',
                   backgroundImage: 'linear-gradient(#1a1410, #1a1410), linear-gradient(135deg, #f5e6c8, #e8c76f, #d4af37, #c9a961, #e8c76f)',
                   backgroundOrigin: 'border-box',
@@ -390,17 +453,27 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
                   boxShadow: '0 8px 32px rgba(232, 199, 111, 0.3), inset 0 0 60px rgba(232, 199, 111, 0.05)',
                   cursor: imageZoomed ? 'zoom-out' : 'zoom-in',
                   transition: 'all 0.4s ease',
+                  touchAction: imageZoomed ? 'none' : 'auto',
                 }}
-                onClick={() => setImageZoomed(!imageZoomed)}
+                onClick={handleImageClick}
                 onMouseMove={handleMouseMove}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '0 12px 48px rgba(232, 199, 111, 0.5), inset 0 0 80px rgba(232, 199, 111, 0.08)';
-                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  if (window.innerWidth > 768) {
+                    e.currentTarget.style.boxShadow = '0 12px 48px rgba(232, 199, 111, 0.5), inset 0 0 80px rgba(232, 199, 111, 0.08)';
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  setImageZoomed(false);
-                  e.currentTarget.style.boxShadow = '0 8px 32px rgba(232, 199, 111, 0.3), inset 0 0 60px rgba(232, 199, 111, 0.05)';
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  if (window.innerWidth > 768) {
+                    setImageZoomed(false);
+                    setZoomScale(1);
+                    setPanPosition({ x: 0, y: 0 });
+                    e.currentTarget.style.boxShadow = '0 8px 32px rgba(232, 199, 111, 0.3), inset 0 0 60px rgba(232, 199, 111, 0.05)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }
                 }}
               >
                 <img 
@@ -410,9 +483,11 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
                     width: '100%', 
                     height: '100%', 
                     objectFit: 'cover',
-                    transform: imageZoomed ? 'scale(2)' : 'scale(1)',
-                    transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
-                    transition: imageZoomed ? 'none' : 'transform 0.3s',
+                    transform: window.innerWidth > 768 
+                      ? (imageZoomed ? 'scale(2)' : 'scale(1)')
+                      : `scale(${zoomScale}) translate(${panPosition.x / zoomScale}px, ${panPosition.y / zoomScale}px)`,
+                    transformOrigin: window.innerWidth > 768 ? `${mousePosition.x}% ${mousePosition.y}%` : 'center center',
+                    transition: (window.innerWidth > 768 && !imageZoomed) || (window.innerWidth <= 768 && zoomScale === 1) ? 'transform 0.3s' : 'none',
                   }}
                 />
                 
