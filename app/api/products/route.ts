@@ -12,7 +12,7 @@ export async function GET() {
     });
 
     // Parse JSON strings back to arrays
-    const parsedProducts = products.map((product) => ({
+    const parsedProducts = products.map((product: any) => ({
       ...product,
       details: JSON.parse(product.details),
       detailsEn: JSON.parse(product.detailsEn),
