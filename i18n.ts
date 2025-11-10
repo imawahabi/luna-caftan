@@ -18,7 +18,7 @@ const resources = {
       },
       about: {
         title: 'عن لونا',
-        description: 'أطلقنا بوتيك لونا أونلاين في أكتوبر 2025 لنقدّم قفاطين مغربية فاخرة من فاس إلى الكويت، بإشراف نعيمة لبرينيه (أم راكان) التي تهتم بأدق التفاصيل لجودة لا مثيل لها',
+        description: 'بوتيك لونا متخصص في نقل تراث القفطان المغربي الأصيل من مدينة فاس العريقة إلى الكويت. نحرص على اختيار قطع مصنوعة يدوياً بعناية، تجمع بين الأصالة المغربية والذوق العصري، لنقدم لكِ قفاطين تعكس جمال التراث وتناسب مناسباتك الخاصة',
       },
       collection: {
         title: 'القفاطين',
@@ -45,7 +45,7 @@ const resources = {
       },
       about: {
         title: 'About Us',
-        description: 'Luna Boutique launched online in October 2025 to deliver luxurious Moroccan caftans from Fes to Kuwait under the meticulous eye of Naima Labrinia (Om Rakan)',
+        description: 'Luna Boutique specializes in bringing authentic Moroccan caftan heritage from the historic city of Fes to Kuwait. We carefully select handcrafted pieces that blend Moroccan authenticity with contemporary taste, offering you caftans that reflect the beauty of tradition and suit your special occasions',
       },
       collection: {
         title: 'Collection',

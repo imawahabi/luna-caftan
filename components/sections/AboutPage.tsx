@@ -24,18 +24,18 @@ export default function AboutPage() {
   const values = [
     {
       icon: Scissors,
-      title: i18n.language === 'ar' ? 'حرفية احترافية' : 'Artisanal Mastery',
-      description: i18n.language === 'ar' ? 'قفاطين مصنوعة يدوياً في فاس بدقة تعكس الخبرة' : 'Handcrafted in Fes with the meticulous expertise of Om Rakan',
+      title: i18n.language === 'ar' ? 'صناعة يدوية' : 'Handcrafted',
+      description: i18n.language === 'ar' ? 'قفاطين مصنوعة يدوياً في فاس بدقة وعناية فائقة' : 'Caftans handcrafted in Fes with meticulous care and precision',
     },
     {
       icon: Gem,
-      title: i18n.language === 'ar' ? 'جودة لا تضاهى' : 'Unrivaled Quality',
-      description: i18n.language === 'ar' ? 'مواد منتقاة بعناية لتقديم رفاهية تدوم' : 'Carefully selected materials to deliver lasting luxury',
+      title: i18n.language === 'ar' ? 'جودة عالية' : 'High Quality',
+      description: i18n.language === 'ar' ? 'مواد منتقاة بعناية لتقديم قطع أنيقة ومريحة' : 'Carefully selected materials to deliver elegant and comfortable pieces',
     },
     {
       icon: Crown,
-      title: i18n.language === 'ar' ? 'روح فاس الأصيلة' : 'Spirit of Fes',
-      description: i18n.language === 'ar' ? 'تصاميم تحمل تراث المغرب وتلائم أناقة المرأة الكويتية' : 'Designs that honor Moroccan heritage while embracing Kuwaiti elegance',
+      title: i18n.language === 'ar' ? 'تراث أصيل' : 'Authentic Heritage',
+      description: i18n.language === 'ar' ? 'تصاميم تحمل تراث المغرب وتناسب الذوق العصري' : 'Designs that carry Moroccan heritage and suit modern taste',
     },
   ];
 
@@ -193,8 +193,8 @@ export default function AboutPage() {
                 }}
               >
                 {i18n.language === 'ar'
-                  ? 'في قلب كل قصة عظيمة، توجد رؤية تحلم بجسر يربط بين عالمين. هكذا وُلدت لونا كافتان - حلم نعيمة لبرينيه "أم راكان" بأن تنقل عبق التراث المغربي من قلب فاس العتيقة إلى أرض الكويت، بلد الأناقة والذوق الرفيع.'
-                  : 'At the heart of every great story lies a vision dreaming of a bridge between two worlds. Thus was born Luna Caftan - the dream of Naima Labrinia "Om Rakan" to transport the essence of Moroccan heritage from ancient Fes to Kuwait, the land of elegance and refined taste.'}
+                  ? 'بوتيك لونا متخصص في نقل تراث القفطان المغربي الأصيل من مدينة فاس العريقة إلى الكويت. نختار كل قطعة بعناية لتجمع بين الأصالة المغربية والذوق العصري، مع الحرص على جودة الصناعة اليدوية التي تميز كل قفطان.'
+                  : 'Luna Boutique specializes in bringing authentic Moroccan caftan heritage from the historic city of Fes to Kuwait. We carefully select each piece to blend Moroccan authenticity with contemporary taste, while ensuring the quality of handcraftsmanship that distinguishes every caftan.'}
               </motion.p>
               
               <motion.p 
@@ -211,8 +211,8 @@ export default function AboutPage() {
                 }}
               >
                 {i18n.language === 'ar'
-                  ? 'لم تكن لونا مجرد بوتيك للقفاطين، بل كانت رسالة حب وثقافة - رسالة تقول إن الجمال لا حدود له، وأن التراث عندما يلتقي بالحداثة يولد تحفة فنية خالدة. كل قفطان يحمل قصة فاس، أزقة حرفتها، وأيادي صناعها.'
-                  : 'Luna was never just a caftan boutique, but a message of love and culture - a message that beauty knows no borders, and that when heritage meets modernity, an eternal masterpiece is born. Each caftan carries the story of Fes, its crafted alleys, and the hands of its artisans.'}
+                  ? 'نؤمن بأن القفطان المغربي يحمل قصة وتراثاً عريقاً. لذلك نحرص على اختيار قطع تعكس جمال الصناعة اليدوية الفاسية، وتناسب مناسباتك الخاصة بأسلوب يجمع بين الأصالة والعصرية.'
+                  : 'We believe that the Moroccan caftan carries a story and rich heritage. Therefore, we carefully select pieces that reflect the beauty of Fassi craftsmanship and suit your special occasions with a style that combines authenticity and modernity.'}
               </motion.p>
               
               <motion.div
@@ -235,8 +235,8 @@ export default function AboutPage() {
                   fontWeight: '500',
                 }}>
                   {i18n.language === 'ar'
-                    ? 'نعيمة لبرينيه "أم راكان" - الروح التي تضخ الحياة في كل تفصيلة. من اختيار الخامات النادرة إلى الإشراف على كل غرزة، تضع خبرتها وخبرتها الفاسية لتضمن أن كل قطعة ليست مجرد ملابس، بل إرث يرتدي.'
-                    : 'Naima Labrinia "Om Rakan" - the soul that breathes life into every detail. From selecting rare fabrics to supervising every stitch, she puts her Fassi expertise and experience to ensure that each piece is not just clothing, but wearable heritage.'}
+                    ? 'نختار كل قفطان بعناية فائقة، من الأقمشة الفاخرة إلى التطريزات الدقيقة. نحرص على أن تكون كل قطعة تعبيراً عن الحرفية المغربية الأصيلة، وتناسب ذوقك وتطلعاتك.'
+                    : 'We select each caftan with great care, from luxurious fabrics to precise embroidery. We ensure that every piece expresses authentic Moroccan craftsmanship and suits your taste and aspirations.'}
                 </p>
               </motion.div>
               
@@ -253,8 +253,8 @@ export default function AboutPage() {
                 }}
               >
                 {i18n.language === 'ar'
-                  ? 'في لونا، لا نبيع القفاطين فقط - نشارككم جزءاً من روح المغرب، ونحكي قصة الأناقة التي تتحدث لغة واحدة في كل أنحاء العالم: لغة الجمال الأصيل والذوق الرفيع.'
-                  : 'At Luna, we don\'t just sell caftans - we share with you a piece of Morocco\'s soul, and tell a story of elegance that speaks one language across the world: the language of authentic beauty and refined taste.'}
+                  ? 'في لونا، نقدم لكِ قفاطين تعكس جمال التراث المغربي، وتناسب مناسباتك الخاصة بأسلوب أنيق ومريح.'
+                  : 'At Luna, we offer you caftans that reflect the beauty of Moroccan heritage and suit your special occasions with an elegant and comfortable style.'}
               </motion.p>
             </div>
 
@@ -386,8 +386,8 @@ export default function AboutPage() {
                   fontSize: '1.1rem',
                 }}>
                   {i18n.language === 'ar'
-                    ? 'أن نكون الجسر الثقافي الذي يربط بين تراث المغرب العريق وأناقة الكويت العصرية، مانحين كل امرأة فرصة للتعبير عن هويتها بقطعة تجمع بين الأصالة والحداثة.'
-                    : 'To be the cultural bridge connecting Morocco\'s rich heritage with Kuwait\'s modern elegance, giving every woman the opportunity to express her identity through pieces that unite authenticity and modernity.'}
+                    ? 'نقل تراث القفطان المغربي الأصيل إلى الكويت، وتقديم قطع تجمع بين الأصالة والذوق العصري لكل امرأة تبحث عن التميز.'
+                    : 'Bringing authentic Moroccan caftan heritage to Kuwait, and offering pieces that combine authenticity and contemporary taste for every woman seeking distinction.'}
                 </p>
               </motion.div>
 
@@ -420,8 +420,8 @@ export default function AboutPage() {
                   fontSize: '1.1rem',
                 }}>
                   {i18n.language === 'ar'
-                    ? 'تقديم قفاطين فاخرة تجسد قصص الحرفيين المغاربة، مع ضمان أعلى معايير الجودة والراحة، وخلق تجربة تسوق فريدة تحتفل بالجمال والثقافة.'
-                    : 'To offer luxury caftans that embody the stories of Moroccan artisans, ensuring the highest standards of quality and comfort, and creating a unique shopping experience that celebrates beauty and culture.'}
+                    ? 'تقديم قفاطين مصنوعة يدوياً بعناية، مع الحرص على الجودة والراحة، وتوفير تجربة تسوق مميزة تحتفي بالتراث والجمال.'
+                    : 'Offering carefully handcrafted caftans, with attention to quality and comfort, and providing a distinctive shopping experience that celebrates heritage and beauty.'}
                 </p>
               </motion.div>
             </div>
