@@ -9,6 +9,11 @@ import { ArrowRight, ArrowLeft, Sparkles, Star, Filter, Grid, List, TrendingUp, 
 import { PageType } from '@/app/page';
 import ProductCard from '@/components/ProductCard';
 import ProductCardSkeleton from '@/components/ProductCardSkeleton';
+import { 
+  StatsSkeleton, 
+  SearchSkeleton, 
+  FilterSkeleton 
+} from '@/components/LoadingStates';
 
 interface CollectionPageProps {
   navigateTo: (page: PageType, productId?: string) => void;
@@ -237,80 +242,89 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
 
       {/* Stats Section */}
       <section style={{
-        background: 'linear-gradient(180deg, rgba(10, 8, 8, 0.6) 0%, rgba(26, 20, 16, 0.4) 100%)',
         padding: '3rem 0',
         borderBottom: '1px solid rgba(232, 199, 111, 0.1)',
       }}>
         <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '2rem',
-              textAlign: 'center',
-            }}
-          >
-            <div>
-              <div style={{
-                fontSize: '2.5rem',
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #f5e6c8, #e8c76f)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                marginBottom: '0.5rem',
-              }}>
-                {products.length}
+          {loading ? (
+            <StatsSkeleton />
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '2rem',
+                textAlign: 'center',
+              }}
+            >
+              <div>
+                <div style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(135deg, #f5e6c8, #e8c76f)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  marginBottom: '0.5rem',
+                }}>
+                  {products.length}
+                </div>
+                <div style={{ color: 'rgba(232, 199, 111, 0.7)', fontSize: '1rem' }}>
+                  {i18n.language === 'ar' ? 'قفطان متاح' : 'Available Caftans'}
+                </div>
               </div>
-              <div style={{ color: 'rgba(232, 199, 111, 0.7)', fontSize: '1rem' }}>
-                {i18n.language === 'ar' ? 'قفطان متاح' : 'Available Caftans'}
-              </div>
-            </div>
 
-            <div>
-              <div style={{
-                fontSize: '2.5rem',
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #f5e6c8, #e8c76f)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                marginBottom: '0.5rem',
-              }}>
-                {featuredCount}
+              <div>
+                <div style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(135deg, #f5e6c8, #e8c76f)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  marginBottom: '0.5rem',
+                }}>
+                  {featuredCount}
+                </div>
+                <div style={{ color: 'rgba(232, 199, 111, 0.7)', fontSize: '1rem' }}>
+                  {i18n.language === 'ar' ? 'قفطان مميز' : 'Featured Caftans'}
+                </div>
               </div>
-              <div style={{ color: 'rgba(232, 199, 111, 0.7)', fontSize: '1rem' }}>
-                {i18n.language === 'ar' ? 'قفطان مميز' : 'Featured Caftans'}
-              </div>
-            </div>
 
-            <div>
-              <div style={{
-                fontSize: '2.5rem',
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #f5e6c8, #e8c76f)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                marginBottom: '0.5rem',
-              }}>
-                100%
+              <div>
+                <div style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(135deg, #f5e6c8, #e8c76f)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  marginBottom: '0.5rem',
+                }}>
+                  100%
+                </div>
+                <div style={{ color: 'rgba(232, 199, 111, 0.7)', fontSize: '1rem' }}>
+                  {i18n.language === 'ar' ? 'صناعة يدوية' : 'Handcrafted'}
+                </div>
               </div>
-              <div style={{ color: 'rgba(232, 199, 111, 0.7)', fontSize: '1rem' }}>
-                {i18n.language === 'ar' ? 'صناعة يدوية' : 'Handcrafted'}
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
         </div>
       </section>
 
-      {/* Search Bar */}
-      <section className="section" style={{ paddingTop: '3rem', paddingBottom: '1rem' }}>
+      {/* Search Section */}
+      <section style={{
+        padding: '2rem 0',
+        borderBottom: '1px solid rgba(232, 199, 111, 0.1)',
+      }}>
         <div className="container">
+          {loading ? (
+            <SearchSkeleton />
+          ) : (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -366,8 +380,12 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
               />
             </div>
           </motion.div>
+          )}
 
           {/* Filter & View Controls */}
+          {loading ? (
+            <FilterSkeleton />
+          ) : (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -497,6 +515,7 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
               </div>
             </div>
           </motion.div>
+          )}
 
           {/* Results Count */}
           {searchQuery && (

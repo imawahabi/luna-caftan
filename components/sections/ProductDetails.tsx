@@ -3,9 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProducts } from '@/lib/products-context';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Check, ArrowRight, ZoomIn, Share2, Heart, ChevronLeft, ChevronRight, Star, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ArrowRight, Heart, Star, ShoppingBag, Zap, Crown, Gem, ChevronLeft, ChevronRight, X, Eye, Sparkles, ZoomIn, Share2, Check } from 'lucide-react';
 import { PageType } from '@/app/page';
+import { 
+  TitleSkeleton, 
+  PriceSkeleton, 
+  DescriptionSkeleton, 
+  DetailsListSkeleton, 
+  LikesSkeleton 
+} from '@/components/LoadingStates';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 // Remove local Product interface and use the one from context
@@ -422,7 +429,7 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
           </motion.div>
 
           {/* Product Name in Hero with Enhanced Style */}
-          {product && (
+          {product ? (
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -442,6 +449,8 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
               }}>
                 {i18n.language === 'ar' ? product.name : product.nameEn}
             </motion.h1>
+          ) : (
+            <TitleSkeleton />
           )}
 
           {product?.featured && (
@@ -921,66 +930,63 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
               )}
 
               {/* Price Badge - At the end */}
-              <div style={{
-                background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.12), rgba(212, 175, 55, 0.08))',
-                border: '2px solid rgba(232, 199, 111, 0.25)',
-                borderRadius: '16px',
-                padding: '1.25rem 1.75rem',
-                marginBottom: '2.5rem',
-                position: 'relative',
-                overflow: 'hidden',
-              }}>
-                {/* Decorative corner */}
+              {product ? (
                 <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  [isRTL ? 'left' : 'right']: 0,
-                  width: '60px',
-                  height: '60px',
-                  background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.15), transparent)',
-                  borderRadius: '0 16px 0 100%',
-                }} />
-                
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
+                  background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.12), rgba(212, 175, 55, 0.08))',
+                  border: '2px solid rgba(232, 199, 111, 0.25)',
+                  borderRadius: '16px',
+                  padding: '1.25rem 1.75rem',
+                  marginBottom: '2.5rem',
                   position: 'relative',
-                  zIndex: 1,
+                  overflow: 'hidden',
                 }}>
+                  {/* Decorative corner */}
                   <div style={{
-                    width: '4px',
-                    height: '40px',
-                    background: 'linear-gradient(180deg, var(--color-gold), rgba(232, 199, 111, 0.3))',
-                    borderRadius: '2px',
+                    position: 'absolute',
+                    top: 0,
+                    [isRTL ? 'left' : 'right']: 0,
+                    width: '60px',
+                    height: '60px',
+                    background: 'linear-gradient(135deg, #e8c76f, #d4af37)',
+                    clipPath: 'polygon(100% 0, 0 0, 100% 100%)',
+                    opacity: 0.1,
                   }} />
-                  
-                  <div>
-                    <p style={{
-                      color: 'rgba(232, 199, 111, 0.7)',
-                      fontSize: '0.85rem',
-                      fontWeight: '500',
-                      margin: '0 0 0.25rem 0',
-                      textTransform: 'uppercase',
-                      letterSpacing: '1px',
-                    }}>
-                      {i18n.language === 'ar' ? 'السعر' : 'Price'}
-                    </p>
-                    <p style={{
-                      color: 'var(--color-gold)',
-                      fontSize: '1.35rem',
-                      fontWeight: '700',
-                      margin: 0,
-                      letterSpacing: '0.5px',
-                    }}>
-                      {(product.price && product.price.trim() !== '')
-                        ? (i18n.language === 'ar' ? product.price : product.priceEn)
-                        : (i18n.language === 'ar' ? 'عند الطلب' : 'on Request')
-                      }
-                    </p>
+                  <div style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                    <div>
+                      <p style={{
+                        color: 'rgba(232, 199, 111, 0.8)',
+                        fontSize: '0.9rem',
+                        fontWeight: '500',
+                        margin: '0 0 0.25rem 0',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                      }}>
+                        {i18n.language === 'ar' ? 'السعر' : 'Price'}
+                      </p>
+                      <p style={{
+                        color: 'var(--color-gold)',
+                        fontSize: '1.35rem',
+                        fontWeight: '700',
+                        margin: 0,
+                        letterSpacing: '0.5px',
+                      }}>
+                        {(product.price && product.price.trim() !== '')
+                          ? (i18n.language === 'ar' ? product.price : product.priceEn)
+                          : (i18n.language === 'ar' ? 'عند الطلب' : 'on Request')
+                        }
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <PriceSkeleton />
+              )}
 
               {/* WhatsApp Button */}
               <button
