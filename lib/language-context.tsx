@@ -9,12 +9,14 @@ interface LanguageContextType {
   language: Language;
   toggleLanguage: () => void;
   isRTL: boolean;
+  isChangingLanguage: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>('ar');
+  const [isChangingLanguage, setIsChangingLanguage] = useState(false);
   const { i18n } = useTranslation();
 
   useEffect(() => {
@@ -30,11 +32,34 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
   }, [language]);
 
-  const toggleLanguage = () => {
+  const toggleLanguage = async () => {
+    if (isChangingLanguage) return; // Prevent multiple clicks during transition
+    
+    setIsChangingLanguage(true);
+    
+    // Start fade out
+    document.body.style.transition = 'opacity 0.3s ease-in-out';
+    document.body.style.opacity = '0';
+    
+    // Wait for fade out to complete
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Change language
     const newLang: Language = language === 'en' ? 'ar' : 'en';
     setLanguage(newLang);
     i18n.changeLanguage(newLang);
     localStorage.setItem('language', newLang);
+    
+    // Wait a bit for language to update
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Fade back in
+    document.body.style.opacity = '1';
+    
+    // Wait for fade in to complete
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    setIsChangingLanguage(false);
   };
 
   return (
@@ -43,6 +68,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         language,
         toggleLanguage,
         isRTL: language === 'ar',
+        isChangingLanguage,
       }}
     >
       {children}

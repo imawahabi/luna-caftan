@@ -13,7 +13,7 @@ interface HeaderProps {
 
 export default function Header({ currentPage, navigateTo }: HeaderProps) {
   const { t } = useTranslation();
-  const { language, toggleLanguage } = useLanguage();
+  const { language, toggleLanguage, isChangingLanguage } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -88,20 +88,10 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
                 border: 'none', 
                 color: currentPage === 'home' ? 'var(--color-gold)' : 'var(--color-cream)',
                 cursor: 'pointer',
+                fontWeight: currentPage === 'home' ? 700 : 500,
               }}
             >
               {t('nav.home')}
-            </button>
-            <button 
-              onClick={() => handleNavClick('about')}
-              style={{ 
-                background: 'none', 
-                border: 'none', 
-                color: currentPage === 'about' ? 'var(--color-gold)' : 'var(--color-cream)',
-                cursor: 'pointer',
-              }}
-            >
-              {t('nav.about')}
             </button>
             <button 
               onClick={() => handleNavClick('collection')}
@@ -110,9 +100,22 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
                 border: 'none', 
                 color: currentPage === 'collection' ? 'var(--color-gold)' : 'var(--color-cream)',
                 cursor: 'pointer',
+                fontWeight: currentPage === 'collection' ? 700 : 500,
               }}
             >
               {t('nav.collection')}
+            </button>
+            <button 
+              onClick={() => handleNavClick('about')}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                color: currentPage === 'about' ? 'var(--color-gold)' : 'var(--color-cream)',
+                cursor: 'pointer',
+                fontWeight: currentPage === 'about' ? 700 : 500,
+              }}
+            >
+              {t('nav.about')}
             </button>
             <button 
               onClick={() => handleNavClick('contact')}
@@ -121,19 +124,70 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
                 border: 'none', 
                 color: currentPage === 'contact' ? 'var(--color-gold)' : 'var(--color-cream)',
                 cursor: 'pointer',
+                fontWeight: currentPage === 'contact' ? 700 : 500,
               }}
             >
               {t('nav.contact')}
             </button>
             
-            <button onClick={toggleLanguage} className="lang-toggle">
-              {language === 'en' ? 'العربية' : 'EN'}
+            <button 
+              onClick={toggleLanguage} 
+              className="lang-toggle"
+              disabled={isChangingLanguage}
+              style={{
+                opacity: isChangingLanguage ? 0.6 : 1,
+                cursor: isChangingLanguage ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s ease',
+              }}
+            >
+              {isChangingLanguage ? (
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span 
+                    style={{ 
+                      width: '16px', 
+                      height: '16px', 
+                      border: '2px solid currentColor', 
+                      borderTop: '2px solid transparent', 
+                      borderRadius: '50%', 
+                      animation: 'spin 1s linear infinite' 
+                    }}
+                  />
+                  {language === 'en' ? 'العربية' : 'EN'}
+                </span>
+              ) : (
+                language === 'en' ? 'العربية' : 'EN'
+              )}
             </button>
           </nav>
 
           {/* Mobile Language Toggle */}
-          <button onClick={toggleLanguage} className="lang-toggle mobile-lang-toggle">
-            {language === 'en' ? 'العربية' : 'EN'}
+          <button 
+            onClick={toggleLanguage} 
+            className="lang-toggle mobile-lang-toggle"
+            disabled={isChangingLanguage}
+            style={{
+              opacity: isChangingLanguage ? 0.6 : 1,
+              cursor: isChangingLanguage ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s ease',
+            }}
+          >
+            {isChangingLanguage ? (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span 
+                  style={{ 
+                    width: '14px', 
+                    height: '14px', 
+                    border: '2px solid currentColor', 
+                    borderTop: '2px solid transparent', 
+                    borderRadius: '50%', 
+                    animation: 'spin 1s linear infinite' 
+                  }}
+                />
+                {language === 'en' ? 'العربية' : 'EN'}
+              </span>
+            ) : (
+              language === 'en' ? 'العربية' : 'EN'
+            )}
           </button>
 
           {/* Mobile Menu Button */}
@@ -150,10 +204,30 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
         style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}
       >
         <nav>
-          <button onClick={() => handleNavClick('home')}>{t('nav.home')}</button>
-          <button onClick={() => handleNavClick('about')}>{t('nav.about')}</button>
-          <button onClick={() => handleNavClick('collection')}>{t('nav.collection')}</button>
-          <button onClick={() => handleNavClick('contact')}>{t('nav.contact')}</button>
+          <button
+            onClick={() => handleNavClick('home')}
+            style={{ fontWeight: currentPage === 'home' ? 700 : 500 }}
+          >
+            {t('nav.home')}
+          </button>
+          <button
+            onClick={() => handleNavClick('collection')}
+            style={{ fontWeight: currentPage === 'collection' ? 700 : 500 }}
+          >
+            {t('nav.collection')}
+          </button>
+          <button
+            onClick={() => handleNavClick('about')}
+            style={{ fontWeight: currentPage === 'about' ? 700 : 500 }}
+          >
+            {t('nav.about')}
+          </button>
+          <button
+            onClick={() => handleNavClick('contact')}
+            style={{ fontWeight: currentPage === 'contact' ? 700 : 500 }}
+          >
+            {t('nav.contact')}
+          </button>
         </nav>
       </div>
     </>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useProducts } from '@/lib/products-context';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Sparkles, Star, Filter, Grid, List, TrendingUp, Search, SortAsc, Eye, Heart } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Sparkles, Star, Filter, Grid, List, TrendingUp, Search, SortAsc, Eye, Heart, ImageIcon } from 'lucide-react';
 import { PageType } from '@/app/page';
 import ProductCard from '@/components/ProductCard';
 import ProductCardSkeleton from '@/components/ProductCardSkeleton';
@@ -29,6 +29,8 @@ interface Product {
   priceEn: string;
   images: string[];
   featured: boolean;
+  likes?: number;
+  details?: string[];
 }
 
 export default function CollectionPage({ navigateTo }: CollectionPageProps) {
@@ -41,6 +43,7 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);
+  const [hoveredProductId, setHoveredProductId] = useState<string | null>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -563,21 +566,27 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
                 </>
               ) : filteredProducts.length > 0 ? (
                 <>
-                  {filteredProducts.map((product, index) => (
-                    viewMode === 'grid' ? (
-                      <motion.div
-                        key={product.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.4, delay: index * 0.1 }}
-                      >
-                        <ProductCard
-                          product={product}
-                          onClick={() => navigateToProduct(product.id)}
-                          showStats={true}
-                        />
-                      </motion.div>
-                    ) : (
+                  {filteredProducts.map((product: Product, index: number) => {
+                    const isHovered = hoveredProductId === product.id;
+
+                    if (viewMode === 'grid') {
+                      return (
+                        <motion.div
+                          key={product.id}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.4, delay: index * 0.1 }}
+                        >
+                          <ProductCard
+                            product={product}
+                            onClick={() => navigateToProduct(product.id)}
+                            showStats={true}
+                          />
+                        </motion.div>
+                      );
+                    }
+
+                    return (
                       <motion.div
                         key={product.id}
                         initial={{ opacity: 0, x: -20 }}
@@ -598,11 +607,13 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
                           transition: 'all 0.3s',
                         }}
                         onMouseEnter={(e) => {
+                          setHoveredProductId(product.id);
                           e.currentTarget.style.borderColor = 'rgba(232, 199, 111, 0.4)';
                           e.currentTarget.style.transform = 'translateY(-4px)';
                           e.currentTarget.style.boxShadow = '0 20px 40px rgba(232, 199, 111, 0.15)';
                         }}
                         onMouseLeave={(e) => {
+                          setHoveredProductId(null);
                           e.currentTarget.style.borderColor = 'rgba(232, 199, 111, 0.15)';
                           e.currentTarget.style.transform = 'translateY(0)';
                           e.currentTarget.style.boxShadow = 'none';
@@ -632,24 +643,87 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
                             }}
                           />
                           {product.featured && (
-                            <div style={{
-                              position: 'absolute',
-                              top: '1rem',
-                              left: isRTL ? 'auto' : '1rem',
-                              right: isRTL ? '1rem' : 'auto',
-                              background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.95), rgba(212, 175, 55, 0.9))',
-                              padding: '0.4rem 0.8rem',
-                              borderRadius: '50px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.3rem',
-                              fontSize: '0.85rem',
-                              fontWeight: '600',
-                              color: '#1a1410',
-                            }}>
-                              <Star size={14} fill="#1a1410" />
-                              {i18n.language === 'ar' ? 'مميز' : 'Featured'}
-                            </div>
+                            <motion.div 
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                              style={{
+                                position: 'absolute',
+                                top: isMobile ? '0.8rem' : '1rem',
+                                [isRTL ? 'left' : 'right']: isMobile ? '0.8rem' : '1rem',
+                                background: 'rgba(0, 0, 0, 0.4)',
+                                backdropFilter: 'blur(16px) saturate(150%)',
+                                WebkitBackdropFilter: 'blur(16px) saturate(150%)',
+                                padding: isHovered ? '0.5rem 1.1rem 0.5rem 0.5rem' : '0.5rem',
+                                borderRadius: isHovered ? '50px' : '50%',
+                                width: isHovered ? 'auto' : '40px',
+                                height: '40px',
+                                border: '1px solid rgba(232, 199, 111, 0.25)',
+                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(232, 199, 111, 0.1)',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: isHovered ? '0.5rem' : '0',
+                                zIndex: 10,
+                                overflow: 'hidden',
+                                whiteSpace: 'nowrap' as const,
+                                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                              }}
+                            >
+                              <motion.div
+                                animate={{ opacity: isHovered ? 0.4 : 0.2 }}
+                                transition={{ duration: 0.4 }}
+                                style={{
+                                  position: 'absolute',
+                                  inset: '-1px',
+                                  background: 'radial-gradient(circle at center, rgba(232, 199, 111, 0.2), transparent 70%)',
+                                  borderRadius: '50px',
+                                  pointerEvents: 'none',
+                                  zIndex: -1,
+                                }}
+                              />
+                              <motion.div
+                                animate={{ rotate: isHovered ? [0, -10, 10, -10, 0] : 0 }}
+                                transition={{ duration: 0.6, ease: 'easeInOut' }}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                <Sparkles
+                                  size={16}
+                                  style={{
+                                    color: '#e8c76f',
+                                    filter: 'drop-shadow(0 0 6px rgba(232, 199, 111, 0.4))',
+                                    strokeWidth: 2,
+                                  }}
+                                />
+                              </motion.div>
+                              <motion.span
+                                initial={{ width: 0, opacity: 0, marginLeft: 0 }}
+                                animate={{
+                                  width: isHovered ? 'auto' : 0,
+                                  opacity: isHovered ? 1 : 0,
+                                  marginLeft: isHovered ? '0.25rem' : 0,
+                                }}
+                                transition={{
+                                  duration: 0.35,
+                                  ease: [0.4, 0, 0.2, 1],
+                                  opacity: { delay: isHovered ? 0.1 : 0 },
+                                }}
+                                style={{
+                                  color: '#e8c76f',
+                                  fontSize: '0.8rem',
+                                  fontWeight: '600',
+                                  letterSpacing: '0.5px',
+                                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
+                                  overflow: 'hidden',
+                                }}
+                              >
+                                {isRTL ? 'قطعة مميزة' : 'Featured'}
+                              </motion.span>
+                            </motion.div>
                           )}
                         </div>
 
@@ -706,6 +780,105 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
                               {i18n.language === 'ar' ? product.price : product.priceEn}
                             </div>
                             
+                            {/* Additional Info Badges */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.6rem',
+                              flexWrap: 'wrap',
+                            }}>
+                              {/* Images Count */}
+                              <motion.div 
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ delay: 0.1, duration: 0.3 }}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.4rem',
+                                  padding: '0.5rem 0.9rem',
+                                  background: 'rgba(255, 255, 255, 0.08)',
+                                  backdropFilter: 'blur(12px)',
+                                  border: '1px solid rgba(232, 199, 111, 0.4)',
+                                  borderRadius: '20px',
+                                  fontSize: '0.85rem',
+                                  fontWeight: '600',
+                                  color: '#e8c76f',
+                                  boxShadow: '0 3px 12px rgba(0, 0, 0, 0.15)',
+                                  minWidth: '70px',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                <ImageIcon size={15} />
+                                <span>{product.images?.length || 0}</span>
+                                <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>
+                                  {i18n.language === 'ar' ? 'صور' : 'Photos'}
+                                </span>
+                              </motion.div>
+                              
+                              {/* Likes Count - Only show if likes > 0 */}
+                              {product.likes !== undefined && product.likes > 0 && (
+                                <motion.div 
+                                  initial={{ scale: 0.8, opacity: 0 }}
+                                  animate={{ scale: 1, opacity: 1 }}
+                                  transition={{ delay: 0.2, duration: 0.3 }}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.4rem',
+                                    padding: '0.5rem 0.9rem',
+                                    background: 'rgba(231, 76, 60, 0.15)',
+                                    backdropFilter: 'blur(12px)',
+                                    border: '1px solid rgba(231, 76, 60, 0.4)',
+                                    borderRadius: '20px',
+                                    fontSize: '0.85rem',
+                                    fontWeight: '600',
+                                    color: '#e74c3c',
+                                    boxShadow: '0 3px 12px rgba(231, 76, 60, 0.2)',
+                                    minWidth: '80px',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  <Heart size={15} fill="#e74c3c" />
+                                  <span>{product.likes}</span>
+                                  <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>
+                                    {i18n.language === 'ar' ? 'إعجابات' : 'Likes'}
+                                  </span>
+                                </motion.div>
+                              )}
+                              
+                              {/* Details Count - Based on details length */}
+                              {product.details && product.details.length > 0 && (
+                                <motion.div 
+                                  initial={{ scale: 0.8, opacity: 0 }}
+                                  animate={{ scale: 1, opacity: 1 }}
+                                  transition={{ delay: 0.3, duration: 0.3 }}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.4rem',
+                                    padding: '0.5rem 0.9rem',
+                                    background: 'rgba(52, 152, 219, 0.15)',
+                                    backdropFilter: 'blur(12px)',
+                                    border: '1px solid rgba(52, 152, 219, 0.4)',
+                                    borderRadius: '20px',
+                                    fontSize: '0.85rem',
+                                    fontWeight: '600',
+                                    color: '#3498db',
+                                    boxShadow: '0 3px 12px rgba(52, 152, 219, 0.2)',
+                                    minWidth: '85px',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  <Sparkles size={15} />
+                                  <span>{product.details.length}</span>
+                                  <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>
+                                    {i18n.language === 'ar' ? 'تفاصيل' : 'Details'}
+                                  </span>
+                                </motion.div>
+                              )}
+                            </div>
+                            
                             <div style={{
                               display: 'inline-flex',
                               alignItems: 'center',
@@ -717,6 +890,17 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
                               color: '#e8c76f',
                               fontSize: isMobile ? '0.85rem' : '0.9rem',
                               fontWeight: '600',
+                              cursor: 'pointer',
+                              transition: 'all 0.3s ease',
+                            }}
+                            onClick={() => navigateTo('product', product.id)}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(232, 199, 111, 0.3), rgba(212, 175, 55, 0.25))';
+                              e.currentTarget.style.transform = 'translateY(-1px)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(232, 199, 111, 0.2), rgba(212, 175, 55, 0.15))';
+                              e.currentTarget.style.transform = 'translateY(0)';
                             }}>
                               <Eye size={isMobile ? 14 : 16} />
                               {i18n.language === 'ar' ? 'عرض' : 'View'}
@@ -724,8 +908,8 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
                           </div>
                         </div>
                       </motion.div>
-                    )
-                  ))}
+                    );
+                  })}
                 </>
               ) : (
                 <motion.div

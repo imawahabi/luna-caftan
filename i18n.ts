@@ -6,8 +6,8 @@ const resources = {
     translation: {
       nav: {
         home: 'الرئيسية',
-        about: 'عن لونا',
         collection: 'القفاطين',
+        about: 'عن لونا',
         contact: 'تواصلي معنا',
       },
       home: {
@@ -33,8 +33,8 @@ const resources = {
     translation: {
       nav: {
         home: 'Home',
-        about: 'About',
         collection: 'Collection',
+        about: 'About Luna',
         contact: 'Contact',
       },
       home: {
@@ -44,7 +44,7 @@ const resources = {
         },
       },
       about: {
-        title: 'About Us',
+        title: 'About Luna',
         description: 'Luna Boutique specializes in bringing authentic Moroccan caftan heritage from the historic city of Fes to Kuwait. We carefully select handcrafted pieces that blend Moroccan authenticity with contemporary taste, offering you caftans that reflect the beauty of tradition and suit your special occasions',
       },
       collection: {
@@ -62,8 +62,8 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'ar',
-    fallbackLng: 'ar',
+    lng: 'en',
+    fallbackLng: 'en',
     interpolation: {
       escapeValue: false,
     },

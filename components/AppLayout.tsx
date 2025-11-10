@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ScrollToTopButton from '@/components/ScrollToTopButton';
 import { PageType } from '@/app/page';
 
 interface AppLayoutProps {
@@ -47,6 +48,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <Header currentPage={getCurrentPage()} navigateTo={navigateTo} />
       {children}
       <Footer navigateTo={navigateTo} />
+      <ScrollToTopButton />
     </div>
   );
 }

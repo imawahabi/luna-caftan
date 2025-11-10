@@ -2,8 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import HomePage from '@/components/sections/HomePage';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import AppLayout from '@/components/AppLayout';
 
 export type PageType = 'home' | 'about' | 'collection' | 'contact' | 'product';
 
@@ -12,7 +11,7 @@ export default function MainApp() {
 
   const navigateTo = (page: PageType, productId?: string) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     if (page === 'home') {
       router.push('/');
     } else if (page === 'about') {
@@ -25,10 +24,8 @@ export default function MainApp() {
   };
 
   return (
-    <div>
-      <Header currentPage="home" navigateTo={navigateTo} />
+    <AppLayout>
       <HomePage navigateTo={navigateTo} />
-      <Footer navigateTo={navigateTo} />
-    </div>
+    </AppLayout>
   );
 }

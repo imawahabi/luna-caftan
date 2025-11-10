@@ -262,13 +262,24 @@ body::after {
 .logo-header .logo img {
   height: 50px;
   width: auto;
-  transition: transform 0.3s, filter 0.3s;
-  filter: drop-shadow(0 2px 8px rgba(232, 199, 111, 0.3));
+  transition: transform 0.25s ease;
+}
+
+header .logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  border-radius: 999px;
+  transition: transform 0.25s ease;
+}
+
+header .logo:hover {
+  transform: translateY(-1px) scale(1.02);
 }
 
 header .logo:hover img {
-  transform: scale(1.05);
-  filter: drop-shadow(0 4px 12px rgba(232, 199, 111, 0.5));
+  transform: scale(1.02);
 }
 
 @media (max-width: 768px) {
@@ -1654,6 +1665,11 @@ footer::after {
   100% { transform: rotate(360deg); }
 }
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .social-link:hover::before {
   width: 120%;
   height: 120%;
@@ -1859,5 +1875,31 @@ footer::after {
   .footer-bottom-links {
     flex-direction: column;
     gap: 0.6rem;
+  }
+}
+
+/* Scroll to Top Button Styles */
+.scroll-to-top-btn {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.scroll-to-top-btn:hover {
+  transform: scale(1.02) !important;
+}
+
+.scroll-to-top-btn:active {
+  transform: scale(0.98) !important;
+}
+
+/* Mobile optimizations for scroll to top button */
+@media (max-width: 768px) {
+  .scroll-to-top-btn {
+    bottom: 1rem !important;
+    right: 1rem !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
   }
 }

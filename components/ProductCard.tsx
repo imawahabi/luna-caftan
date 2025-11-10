@@ -16,6 +16,7 @@ interface Product {
   images: string[];
   featured: boolean;
   likes?: number;
+  details?: string[];
 }
 
 interface ProductCardProps {
@@ -223,25 +224,39 @@ export default function ProductCard({ product, onClick, variants, showStats = fa
           }}>
             {/* Image Count Badge */}
             {showStats && images.length > 0 && (
-              <div style={{
-                background: 'rgba(0, 0, 0, 0.6)',
-                backdropFilter: 'blur(12px)',
-                padding: '0.4rem 0.65rem',
-                borderRadius: '8px',
-                border: '1px solid rgba(232, 199, 111, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-              }}>
+              <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.1, duration: 0.3 }}
+                style={{
+                  background: 'rgba(0, 0, 0, 0.6)',
+                  backdropFilter: 'blur(12px)',
+                  padding: '0.4rem 0.7rem',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(232, 199, 111, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  minWidth: '55px',
+                  justifyContent: 'center',
+                }}
+              >
                 <Images size={14} style={{ color: '#e8c76f' }} />
                 <span style={{
                   color: '#e8c76f',
-                  fontSize: '0.75rem',
+                  fontSize: '0.8rem',
                   fontWeight: '600',
                 }}>
                   {images.length}
                 </span>
-              </div>
+                <span style={{ 
+                  fontSize: '0.65rem', 
+                  opacity: 0.7,
+                  color: '#e8c76f'
+                }}>
+                  {i18n.language === 'ar' ? 'صور' : 'Photos'}
+                </span>
+              </motion.div>
             )}
             
             {/* Likes Badge - Only show if likes exist and greater than 0 */}
@@ -249,25 +264,78 @@ export default function ProductCard({ product, onClick, variants, showStats = fa
              product.likes !== undefined && 
              product.likes !== null && 
              Number(product.likes) > 0 && (
-              <div style={{
-                background: 'rgba(0, 0, 0, 0.6)',
-                backdropFilter: 'blur(12px)',
-                padding: '0.4rem 0.65rem',
-                borderRadius: '8px',
-                border: '1px solid rgba(232, 199, 111, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-              }}>
-                <Heart size={14} style={{ color: '#e8c76f', fill: '#e8c76f' }} />
+              <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.3 }}
+                style={{
+                  background: 'rgba(231, 76, 60, 0.15)',
+                  backdropFilter: 'blur(12px)',
+                  padding: '0.4rem 0.7rem',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(231, 76, 60, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  minWidth: '60px',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px rgba(231, 76, 60, 0.2)',
+                }}
+              >
+                <Heart size={14} style={{ color: '#e74c3c', fill: '#e74c3c' }} />
                 <span style={{
-                  color: '#e8c76f',
-                  fontSize: '0.75rem',
+                  color: '#e74c3c',
+                  fontSize: '0.8rem',
                   fontWeight: '600',
                 }}>
                   {product.likes}
                 </span>
-              </div>
+                <span style={{ 
+                  fontSize: '0.65rem', 
+                  opacity: 0.7,
+                  color: '#e74c3c'
+                }}>
+                  {i18n.language === 'ar' ? 'إعجابات' : 'Likes'}
+                </span>
+              </motion.div>
+            )}
+            
+            {/* Details Count Badge */}
+            {showStats && product.details && product.details.length > 0 && (
+              <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.3 }}
+                style={{
+                  background: 'rgba(52, 152, 219, 0.15)',
+                  backdropFilter: 'blur(12px)',
+                  padding: '0.4rem 0.7rem',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(52, 152, 219, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  minWidth: '65px',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px rgba(52, 152, 219, 0.2)',
+                }}
+              >
+                <Sparkles size={14} style={{ color: '#3498db' }} />
+                <span style={{
+                  color: '#3498db',
+                  fontSize: '0.8rem',
+                  fontWeight: '600',
+                }}>
+                  {product.details.length}
+                </span>
+                <span style={{ 
+                  fontSize: '0.65rem', 
+                  opacity: 0.7,
+                  color: '#3498db'
+                }}>
+                  {i18n.language === 'ar' ? 'تفاصيل' : 'Details'}
+                </span>
+              </motion.div>
             )}
           </div>
           
