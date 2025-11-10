@@ -19,6 +19,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     if (pathname === '/') return 'home';
     if (pathname === '/about') return 'about';
     if (pathname === '/collection') return 'collection';
+    if (pathname === '/contact') return 'contact';
     if (pathname?.startsWith('/caftans')) return 'product';
     return 'home';
   };
@@ -34,7 +35,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     } else if (page === 'collection') {
       router.push('/collection');
     } else if (page === 'contact') {
-      router.push('/#contact');
+      router.push('/contact');
     } else if (page === 'product' && productId) {
       // This will be handled by the calling component
       // which has access to product data

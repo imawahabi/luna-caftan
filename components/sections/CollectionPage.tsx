@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import { useProducts } from '@/lib/products-context';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Sparkles, Star, Filter, Grid, List, TrendingUp, Search, SortAsc, Eye, Heart } from 'lucide-react';
 import { PageType } from '@/app/page';
@@ -29,17 +30,14 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
-  const [products, setProducts] = useState<Product[]>([]);
+  const { products, loading } = useProducts();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<'all' | 'featured'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    fetchProducts();
-    
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
@@ -49,26 +47,13 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch('/api/products');
-      const data = await res.json();
-      const normalizedProducts = Array.isArray(data) ? data : [];
-      /*  Display by newest only (no featured priority)
-      setProducts(normalizedProducts);
-      setFilteredProducts(normalizedProducts);*/
-      const featuredFirst = [...normalizedProducts].sort((a, b) => {
-        if (a.featured === b.featured) return 0;
-        return a.featured ? -1 : 1;
-      });
-      setProducts(featuredFirst);
-      setFilteredProducts(featuredFirst);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Sort products with featured first
+  const sortedProducts = useMemo(() => {
+    return [...products].sort((a, b) => {
+      if (a.featured === b.featured) return 0;
+      return a.featured ? -1 : 1;
+    });
+  }, [products]);
 
   useEffect(() => {
     let filtered = products;

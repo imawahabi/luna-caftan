@@ -16,7 +16,7 @@ export default function CollectionPageRoute() {
     } else if (page === 'about') {
       router.push('/about');
     } else if (page === 'contact') {
-      router.push('/#contact');
+      router.push('/contact');
     } else if (page === 'product' && productId) {
       // Will be handled by CollectionPage
     }

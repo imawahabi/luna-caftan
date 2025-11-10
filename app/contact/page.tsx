@@ -2,10 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import { PageType } from '@/app/page';
-import AboutPage from '@/components/sections/AboutPage';
+import ContactPage from '@/components/sections/ContactPage';
 import AppLayout from '@/components/AppLayout';
 
-export default function AboutPageRoute() {
+export default function ContactPageRoute() {
   const router = useRouter();
 
   const navigateTo = (page: PageType, productId?: string) => {
@@ -13,16 +13,16 @@ export default function AboutPageRoute() {
     
     if (page === 'home') {
       router.push('/');
+    } else if (page === 'about') {
+      router.push('/about');
     } else if (page === 'collection') {
       router.push('/collection');
-    } else if (page === 'contact') {
-      router.push('/contact');
     }
   };
 
   return (
     <AppLayout>
-      <AboutPage />
+      <ContactPage />
     </AppLayout>
   );
 }

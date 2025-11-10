@@ -20,7 +20,7 @@ export default function MainApp() {
     } else if (page === 'collection') {
       router.push('/collection');
     } else if (page === 'contact') {
-      router.push('/#contact');
+      router.push('/contact');
     }
   };
 

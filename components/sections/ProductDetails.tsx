@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useProducts } from '@/lib/products-context';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Check, ArrowRight, ZoomIn, Share2, Heart, ChevronLeft, ChevronRight, Star, Sparkles } from 'lucide-react';
 import { PageType } from '@/app/page';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
-interface Product {
+// Remove local Product interface and use the one from context
+type Product = {
   id: string;
   name: string;
   nameEn: string;
@@ -15,12 +17,12 @@ interface Product {
   descriptionEn: string;
   price: string;
   priceEn: string;
-  details: string[];
-  detailsEn: string[];
+  details?: string[];
+  detailsEn?: string[];
   images: string[];
   featured: boolean;
-  likes: number;
-}
+  likes?: number;
+};
 
 interface ProductDetailsProps {
   productId: string;
@@ -30,8 +32,8 @@ interface ProductDetailsProps {
 export default function ProductDetails({ productId, navigateTo }: ProductDetailsProps) {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
+  const { products: allProducts, loading: productsLoading } = useProducts();
   const [product, setProduct] = useState<Product | null>(null);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [selectedImage, setSelectedImage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [imageZoomed, setImageZoomed] = useState(false);
@@ -76,31 +78,23 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
   }, [product]);
 
   useEffect(() => {
-    fetchProduct();
+    if (productsLoading) {
+      setLoading(true);
+      return;
+    }
+    
+    const foundProduct = allProducts.find((p: Product) => p.id === productId);
+    
+    if (foundProduct) {
+      setProduct(foundProduct);
+    }
+    setLoading(false);
+    
     // Cleanup on unmount
     return () => {
       setProduct(null);
-      setLoading(true);
     };
-  }, [productId]);
-
-  const fetchProduct = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch('/api/products');
-      const data = await res.json();
-      setAllProducts(data);
-      
-      const foundProduct = data.find((p: Product) => p.id === productId);
-      setProduct(foundProduct || null);
-      setLikesCount(foundProduct?.likes || 0);
-      setSelectedImage(0);
-    } catch (error) {
-      console.error('Error fetching product:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [productId, allProducts, productsLoading]);
 
   const handleLike = async () => {
     if (isLiking || !product) return;
@@ -485,36 +479,54 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
         background: 'linear-gradient(180deg, #1a1410 0%, #0a0a0a 100%)',
       }}>
         <div className="container">
-          {/* Back Button */}
+          {/* Back Button - Professional & Lightweight */}
           <div style={{ display: 'flex', justifyContent: isRTL ? 'flex-start' : 'flex-end', marginBottom: '3rem' }}>
-            <button 
+            <motion.button
               onClick={() => navigateTo('collection')}
+              whileHover={{ scale: 1.05, x: isRTL ? 8 : -8 }}
+              whileTap={{ scale: 0.98 }}
               style={{
-                background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.15), rgba(212, 175, 55, 0.1))',
-                border: '1px solid rgba(232, 199, 111, 0.3)',
-                borderRadius: '12px',
+                padding: '0.75rem 1.75rem',
+                background: 'transparent',
+                border: '1px solid rgba(232, 199, 111, 0.2)',
+                borderRadius: '50px',
                 color: 'var(--color-gold)',
+                fontSize: '0.9rem',
+                fontWeight: '500',
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.75rem',
-                fontSize: '1rem',
-                padding: '0.75rem 1.5rem',
-                transition: 'all 0.3s',
-                fontWeight: '600',
+                gap: '0.5rem',
+                transition: 'all 0.2s ease',
+                letterSpacing: '0.5px',
+                position: 'relative',
+                overflow: 'hidden',
+                backdropFilter: 'blur(10px)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateX(' + (isRTL ? '8px' : '-8px') + ')';
-                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(232, 199, 111, 0.25), rgba(212, 175, 55, 0.15))';
+                e.currentTarget.style.background = 'rgba(232, 199, 111, 0.08)';
+                e.currentTarget.style.borderColor = 'rgba(232, 199, 111, 0.4)';
+                e.currentTarget.style.color = '#e8c76f';
+                e.currentTarget.style.letterSpacing = '0.75px';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateX(0)';
-                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(232, 199, 111, 0.15), rgba(212, 175, 55, 0.1))';
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.borderColor = 'rgba(232, 199, 111, 0.2)';
+                e.currentTarget.style.color = 'var(--color-gold)';
+                e.currentTarget.style.letterSpacing = '0.5px';
               }}
             >
-              {isRTL ? <ArrowRight size={20} strokeWidth={2.5} /> : <ArrowLeft size={20} strokeWidth={2.5} />}
-              <span>{i18n.language === 'ar' ? 'العودة للقفاطين' : 'Back to Caftans'}</span>
-            </button>
+              <span style={{ 
+                position: 'relative',
+                zIndex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                {isRTL ? <ArrowRight size={16} style={{ marginLeft: '2px' }} /> : <ArrowLeft size={16} style={{ marginRight: '2px' }} />}
+                {i18n.language === 'ar' ? 'عودة للقفاطن' : 'Back to Caftans'}
+              </span>
+            </motion.button>
           </div>
 
           <div style={{ 
@@ -862,8 +874,8 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
               </div>
 
               {/* Details */}
-              {((i18n.language === 'ar' && product.details.length > 0) || 
-                (i18n.language === 'en' && product.detailsEn.length > 0)) && (
+              {((i18n.language === 'ar' && product.details && product.details.length > 0) || 
+                (i18n.language === 'en' && product.detailsEn && product.detailsEn.length > 0)) && (
                 <div style={{ marginBottom: '2.5rem' }}>
                   <h3 style={{ 
                     color: 'var(--color-cream)', 
@@ -881,7 +893,7 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
                     flexDirection: 'column',
                     gap: '0.75rem',
                   }}>
-                    {(i18n.language === 'ar' ? product.details : product.detailsEn).map((detail, index) => (
+                    {(i18n.language === 'ar' ? product.details : product.detailsEn)?.map((detail, index) => (
                       <li 
                         key={index}
                         style={{ 
@@ -1157,40 +1169,54 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
               })}
             </div>
 
-            {/* View All Button */}
+            {/* View All Button - Professional & Lightweight */}
             <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-              <button
+              <motion.button
                 onClick={() => navigateTo('collection')}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.98 }}
                 style={{
-                  padding: '1rem 2.5rem',
-                  background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.15), rgba(212, 175, 55, 0.1))',
-                  border: '2px solid rgba(232, 199, 111, 0.3)',
-                  borderRadius: '14px',
+                  padding: '0.875rem 2rem',
+                  background: 'transparent',
+                  border: '1px solid rgba(232, 199, 111, 0.2)',
+                  borderRadius: '50px',
                   color: 'var(--color-gold)',
-                  fontSize: '1.05rem',
-                  fontWeight: '700',
+                  fontSize: '0.95rem',
+                  fontWeight: '500',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.75rem',
-                  transition: 'all 0.3s',
+                  gap: '0.5rem',
+                  transition: 'all 0.2s ease',
+                  letterSpacing: '0.5px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  backdropFilter: 'blur(10px)',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #e8c76f, #d4af37)';
-                  e.currentTarget.style.color = '#1a1410';
-                  e.currentTarget.style.transform = 'translateY(-3px)';
-                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(232, 199, 111, 0.4)';
+                  e.currentTarget.style.background = 'rgba(232, 199, 111, 0.08)';
+                  e.currentTarget.style.borderColor = 'rgba(232, 199, 111, 0.4)';
+                  e.currentTarget.style.color = '#e8c76f';
+                  e.currentTarget.style.letterSpacing = '0.75px';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(232, 199, 111, 0.15), rgba(212, 175, 55, 0.1))';
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = 'rgba(232, 199, 111, 0.2)';
                   e.currentTarget.style.color = 'var(--color-gold)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.letterSpacing = '0.5px';
                 }}
               >
-                <span>{i18n.language === 'ar' ? 'عرض جميع القفاطين' : 'View All Caftans'}</span>
-                {isRTL ? <ArrowLeft size={20} /> : <ArrowRight size={20} />}
-              </button>
+                <span style={{ 
+                  position: 'relative',
+                  zIndex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  {i18n.language === 'ar' ? 'استكشفي المزيد' : 'Explore More'}
+                  {isRTL ? <ArrowLeft size={16} style={{ marginLeft: '2px' }} /> : <ArrowRight size={16} style={{ marginRight: '2px' }} />}
+                </span>
+              </motion.button>
             </div>
           </div>
         </section>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { ProductsProvider } from "@/lib/products-context";
 
 const cairo = Cairo({
   variable: "--font-cairo",
@@ -30,7 +31,9 @@ export default function RootLayout({
       </head>
       <body className={cairo.variable} suppressHydrationWarning>
         <Providers>
-          {children}
+          <ProductsProvider>
+            {children}
+          </ProductsProvider>
         </Providers>
       </body>
     </html>

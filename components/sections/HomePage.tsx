@@ -9,6 +9,7 @@ import { PageType } from '@/app/page';
 import ProductCard from '@/components/ProductCard';
 import ProductCardSkeleton from '@/components/ProductCardSkeleton';
 import { useSettings } from '@/lib/settings-context';
+import { useProducts } from '@/lib/products-context';
 
 interface HomePageProps {
   navigateTo: (page: PageType, productId?: string) => void;
@@ -31,8 +32,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const [isMobile, setIsMobile] = useState(false);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { products, loading } = useProducts();
   const { settings } = useSettings();
 
   useEffect(() => {
@@ -46,9 +46,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  // Products are now loaded from context, no need for separate fetch
 
   // Generate URL slug for navigation (always use English name for consistency)
   const generateSlug = (nameEn: string) => {
@@ -71,23 +69,11 @@ export default function HomePage({ navigateTo }: HomePageProps) {
     }
   };
 
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch('/api/products');
-      const data = await res.json();
-      const normalizedProducts = Array.isArray(data) ? data : [];
-      const featuredFirst = [...normalizedProducts].sort((a, b) => {
-        if (a.featured === b.featured) return 0;
-        return a.featured ? -1 : 1;
-      });
-      setProducts(featuredFirst);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setProducts([]); // Set empty array on error
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Sort products to show featured first
+  const featuredProducts = [...products].sort((a, b) => {
+    if (a.featured === b.featured) return 0;
+    return a.featured ? -1 : 1;
+  });
 
   const sectionVariants = {
     hidden: { opacity: 0, y: 60 },
@@ -221,7 +207,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
               </div>
             ) : (
               <>
-                {products.slice(0, 3).map((product) => (
+                {featuredProducts.slice(0, 3).map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}

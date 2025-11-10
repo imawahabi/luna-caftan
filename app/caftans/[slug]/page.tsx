@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { PageType } from '@/app/page';
 import ProductDetails from '@/components/sections/ProductDetails';
 import AppLayout from '@/components/AppLayout';
+import { useProducts } from '@/lib/products-context';
 
 interface CaftanPageProps {
   params: Promise<{
@@ -16,6 +17,7 @@ interface CaftanPageProps {
 export default function CaftanPage({ params }: CaftanPageProps) {
   const router = useRouter();
   const { i18n } = useTranslation();
+  const { products, loading: productsLoading } = useProducts();
   const [productId, setProductId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,45 +25,33 @@ export default function CaftanPage({ params }: CaftanPageProps) {
   // Unwrap the params promise
   const resolvedParams = use(params);
 
-  // Find product by slug
+  // Find product by slug (using context - no fetch)
   useEffect(() => {
-    const findProductBySlug = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch('/api/products');
-        const products = await res.json();
-        
-        if (!Array.isArray(products)) {
-          throw new Error('Products not found');
-        }
+    if (productsLoading || products.length === 0) {
+      setLoading(true);
+      return;
+    }
 
-        // Convert slug to product name comparison
-        const slug = resolvedParams.slug;
-        const foundProduct = products.find((product: any) => {
-          const nameEn = product.nameEn
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .trim();
-          
-          return nameEn === slug;
-        });
+    const slug = resolvedParams.slug;
+    const foundProduct = products.find((product: any) => {
+      const nameEn = product.nameEn
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+      
+      return nameEn === slug;
+    });
 
-        if (foundProduct) {
-          setProductId(foundProduct.id);
-        } else {
-          setError('Product not found');
-        }
-      } catch (err) {
-        setError('Failed to load product');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    findProductBySlug();
-  }, [resolvedParams.slug]);
+    if (foundProduct) {
+      setProductId(foundProduct.id);
+      setError(null);
+    } else {
+      setError('Product not found');
+    }
+    setLoading(false);
+  }, [resolvedParams.slug, products, productsLoading]);
 
   const navigateTo = async (page: PageType, productId?: string) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -73,26 +63,20 @@ export default function CaftanPage({ params }: CaftanPageProps) {
     } else if (page === 'about') {
       router.push('/about');
     } else if (page === 'contact') {
-      router.push('/#contact');
+      router.push('/contact');
     } else if (page === 'product' && productId) {
-      // Find product and generate slug (optimized)
-      try {
-        const res = await fetch(`/api/products`);
-        const products = await res.json();
-        const product = products.find((p: any) => p.id === productId);
-        if (product) {
-          const slug = product.nameEn
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .trim();
-          // Prefetch for faster navigation
-          router.prefetch(`/caftans/${slug}`);
-          router.push(`/caftans/${slug}`);
-        }
-      } catch (error) {
-        console.error('Navigation error:', error);
+      // Find product and generate slug (using context - no fetch)
+      const product = products.find((p: any) => p.id === productId);
+      if (product) {
+        const slug = product.nameEn
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .trim();
+        // Prefetch for faster navigation
+        router.prefetch(`/caftans/${slug}`);
+        router.push(`/caftans/${slug}`);
       }
     }
   };
