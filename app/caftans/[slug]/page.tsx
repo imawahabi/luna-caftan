@@ -7,6 +7,7 @@ import { PageType } from '@/app/page';
 import ProductDetails from '@/components/sections/ProductDetails';
 import AppLayout from '@/components/AppLayout';
 import { useProducts } from '@/lib/products-context';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface CaftanPageProps {
   params: Promise<{
@@ -84,24 +85,10 @@ export default function CaftanPage({ params }: CaftanPageProps) {
   if (loading) {
     return (
       <AppLayout>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '70vh',
-          color: '#e8c76f',
-        }}>
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        <p style={{ color: 'var(--color-gold)', fontSize: '1.5rem' }}>
-          {i18n.language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
-        </p>
-      </div>
-        </div>
+        <LoadingSpinner
+          message={i18n.language === 'ar' ? 'جاري تحميل القفطان...' : 'Loading Caftan...'}
+          fullScreen
+        />
       </AppLayout>
     );
   }

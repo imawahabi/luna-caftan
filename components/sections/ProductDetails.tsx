@@ -45,13 +45,50 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
   const [loading, setLoading] = useState(true);
   const [imageZoomed, setImageZoomed] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [likesCount, setLikesCount] = useState(0);
+  const [likesCount, setLikesCount] = useState<number>(0);
   const [isLiking, setIsLiking] = useState(false);
   const [hasLiked, setHasLiked] = useState(false);
   const [zoomScale, setZoomScale] = useState(1);
   const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   const [initialPinchDistance, setInitialPinchDistance] = useState<number | null>(null);
+
+  const LIKED_PRODUCTS_STORAGE_KEY = 'luna-liked-products';
+
+  const getStoredLikedProductIds = (): string[] => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const stored = window.localStorage.getItem(LIKED_PRODUCTS_STORAGE_KEY);
+      if (!stored) return [];
+      const parsed = JSON.parse(stored);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter((id: unknown): id is string => typeof id === 'string');
+    } catch (error) {
+      console.error('Failed to read liked products from localStorage:', error);
+      return [];
+    }
+  };
+
+  const persistLikedProductIds = (ids: string[]) => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(LIKED_PRODUCTS_STORAGE_KEY, JSON.stringify(ids));
+    } catch (error) {
+      console.error('Failed to store liked products in localStorage:', error);
+    }
+  };
+
+  const syncLikedProductInStorage = (productId: string, liked: boolean) => {
+    if (typeof window === 'undefined') return;
+    const likedIds = getStoredLikedProductIds();
+    const hasId = likedIds.includes(productId);
+
+    if (liked && !hasId) {
+      persistLikedProductIds([...likedIds, productId]);
+    } else if (!liked && hasId) {
+      persistLikedProductIds(likedIds.filter((id) => id !== productId));
+    }
+  };
 
   // Ensure images is always an array
   const productImages = product && Array.isArray(product.images) ? product.images : [];
@@ -94,6 +131,10 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
     
     if (foundProduct) {
       setProduct(foundProduct);
+      setLikesCount(foundProduct.likes ?? 0);
+      setHasLiked(getStoredLikedProductIds().includes(foundProduct.id));
+    } else {
+      setHasLiked(false);
     }
     setLoading(false);
     
@@ -109,10 +150,22 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
       console.error('Error: Product ID is missing. Cannot toggle like.');
       return;
     }
+
+    const previousLikes = likesCount;
+    const previousHasLiked = hasLiked;
+    const nextHasLiked = !hasLiked;
+    const optimisticLikes = nextHasLiked
+      ? previousLikes + 1
+      : Math.max(0, previousLikes - 1);
+
+    setIsLiking(true);
+    setHasLiked(nextHasLiked);
+    setLikesCount(optimisticLikes);
+    syncLikedProductInStorage(product.id, nextHasLiked);
+
     try {
-      setIsLiking(true);
-      const action = hasLiked ? 'remove' : 'add';
-      
+      const action = nextHasLiked ? 'add' : 'remove';
+
       const res = await fetch(`/api/products/${product.id}/like`, {
         method: 'POST',
         headers: {
@@ -124,19 +177,19 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
       if (!res.ok) {
         const errorData = await res.json();
         console.error('Like toggle failed:', res.status, errorData);
-        console.log('Response Status:', res.status);
-        console.log('Response Body:', errorData);
         throw new Error(`Failed to toggle like: Status ${res.status} - ${errorData.error || 'Unknown error'}`);
       }
 
       const data = await res.json();
-      setLikesCount(data.likes);
-      setHasLiked(!hasLiked);
-      
-      // Show animation
-      setTimeout(() => setIsLiking(false), 600);
+      if (typeof data.likes === 'number') {
+        setLikesCount(data.likes);
+      }
     } catch (error) {
       console.error('Error toggling like:', error);
+      setHasLiked(previousHasLiked);
+      setLikesCount(previousLikes);
+      syncLikedProductInStorage(product.id, previousHasLiked);
+    } finally {
       setIsLiking(false);
     }
   };
@@ -670,20 +723,22 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
                         
                         {/* Likes Counter Badge */}
                         {likesCount > 0 && (
-                          <div style={{
-                            position: 'absolute',
-                            bottom: '-8px',
-                            right: '-8px',
-                            background: 'linear-gradient(135deg, #e74c3c, #c0392b)',
-                            borderRadius: '12px',
-                            padding: '0.2rem 0.5rem',
-                            fontSize: '0.75rem',
-                            fontWeight: '700',
-                            color: 'white',
-                            boxShadow: '0 2px 8px rgba(231, 76, 60, 0.4)',
-                            minWidth: '24px',
-                            textAlign: 'center',
-                          }}>
+                          <div
+                            style={{
+                              position: 'absolute',
+                              bottom: '-6px',
+                              right: '-6px',
+                              background: 'linear-gradient(135deg, #e74c3c, #c0392b)',
+                              borderRadius: '30px',
+                              padding: '0.15rem 0.55rem',
+                              fontSize: '0.7rem',
+                              fontWeight: '700',
+                              color: '#fff',
+                              boxShadow: '0 2px 7px rgba(231, 76, 60, 0.35)',
+                              minWidth: '22px',
+                              textAlign: 'center',
+                            }}
+                          >
                             {likesCount}
                           </div>
                         )}

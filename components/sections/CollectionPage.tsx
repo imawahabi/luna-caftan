@@ -343,16 +343,23 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
               display: 'flex',
               alignItems: 'center',
             }}>
-              <Search 
-                size={20} 
+              <div
                 style={{
                   position: 'absolute',
-                  left: isRTL ? 'auto' : '1.2rem',
-                  right: isRTL ? '1.2rem' : 'auto',
-                  color: 'rgba(232, 199, 111, 0.5)',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#e8c76f',
                   pointerEvents: 'none',
-                }} 
-              />
+                  zIndex: 1,
+                  [isRTL ? 'right' : 'left']: '1.5rem',
+                }}
+                aria-hidden="true"
+              >
+                <Search size={20} strokeWidth={2.2} />
+              </div>
               <input
                 type="text"
                 placeholder={i18n.language === 'ar' ? 'ابحثي عن قفطان...' : 'Search for a caftan...'}
@@ -361,8 +368,8 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
                 style={{
                   width: '100%',
                   padding: '1rem 1.2rem',
-                  paddingLeft: isRTL ? '1.2rem' : '3.5rem',
-                  paddingRight: isRTL ? '3.5rem' : '1.2rem',
+                  paddingLeft: isRTL ? '1.2rem' : '3.4rem',
+                  paddingRight: isRTL ? '3.4rem' : '1.2rem',
                   background: 'rgba(0, 0, 0, 0.3)',
                   backdropFilter: 'blur(16px)',
                   border: '1px solid rgba(232, 199, 111, 0.2)',
@@ -916,9 +923,16 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   style={{
+                    gridColumn: '1 / -1',
+                    justifySelf: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     textAlign: 'center',
                     padding: '4rem 2rem',
                     color: 'rgba(232, 199, 111, 0.6)',
+                    minHeight: '280px',
                   }}
                 >
                   <Filter size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
