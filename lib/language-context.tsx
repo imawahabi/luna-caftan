@@ -15,17 +15,21 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguage] = useState<Language>('ar');
+  const [language, setLanguage] = useState<Language>('en');
   const [isChangingLanguage, setIsChangingLanguage] = useState(false);
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    const savedLang = localStorage.getItem('language') as Language;
-    if (savedLang && (savedLang === 'en' || savedLang === 'ar')) {
+    const stored = localStorage.getItem('language');
+    const savedLang = stored === 'ar' || stored === 'en' ? stored : 'en';
+
+    if (savedLang !== language) {
       setLanguage(savedLang);
-      i18n.changeLanguage(savedLang);
     }
-  }, [i18n]);
+
+    i18n.changeLanguage(savedLang);
+    localStorage.setItem('language', savedLang);
+  }, [i18n, language]);
 
   useEffect(() => {
     document.documentElement.lang = language;
