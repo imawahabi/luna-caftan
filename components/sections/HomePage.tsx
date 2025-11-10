@@ -438,12 +438,12 @@ export default function HomePage({ navigateTo }: HomePageProps) {
                   fontStyle: 'italic',
                 }}>
                   {i18n.language === 'ar'
-                    ? 'منذ إطلاق بوتيك لونا أونلاين في أكتوبر 2025، أصبح كل قفطان قصيدة فاخرة تنسج في فاس خصيصاً لأذواق الجميع، مع عناية استثنائية بالتفاصيل وخامات لا تضاهى.'
-                    : 'Since Luna Boutique launched online in October 2025, every caftan has become a luxurious ode woven in Fes for the refined taste of women in Kuwait, crafted with exceptional detail and unrivaled materials.'}
+                    ? 'بوتيك لونا متخصص في تقديم قفاطين مغربية فخمة وأصيلة من مدينة فاس العريقة. نختار كل قطعة بعناية لتجمع بين جمال التراث المغربي والذوق العصري، مع الحرص على جودة الصناعة اليدوية في كل تفصيلة.'
+                    : 'Luna Boutique specializes in offering luxury Moroccan caftans from the historic city of Fes. We carefully select each piece to combine the beauty of Moroccan heritage with contemporary taste, ensuring quality handcraftsmanship in every detail.'}
                 </p>
               </div>
 
-              {/* Founder Signature */}
+              {/* Boutique Info */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -465,14 +465,14 @@ export default function HomePage({ navigateTo }: HomePageProps) {
                     marginBottom: '0.3rem',
                     letterSpacing: '0.5px',
                   }}>
-                    {i18n.language === 'ar' ? 'نعيمه لبرينيه · أم راكان' : 'Naima Labrinia · Om Rakan'}
+                    {i18n.language === 'ar' ? 'بوتيك لونا' : 'Luna Boutique'}
                   </p>
                   <p style={{
                     fontSize: '0.9rem',
                     color: 'var(--color-light-gold)',
                     opacity: 0.8,
                   }}>
-                    {i18n.language === 'ar' ? 'مؤسسة بوتيك لونا' : 'Founder of Luna Boutique'}
+                    {i18n.language === 'ar' ? 'قفاطين مغربية فاخرة من فاس' : 'Luxury Moroccan Caftans from Fes'}
                   </p>
                 </div>
               </div>
