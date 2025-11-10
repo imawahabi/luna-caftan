@@ -1,8 +1,9 @@
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Eye, Sparkles } from 'lucide-react';
+import { Eye, Sparkles, Heart, Images } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -14,18 +15,21 @@ interface Product {
   priceEn: string;
   images: string[];
   featured: boolean;
+  likes?: number;
 }
 
 interface ProductCardProps {
   product: Product;
   onClick: () => void;
   variants?: any;
+  showStats?: boolean;
 }
 
-export default function ProductCard({ product, onClick, variants }: ProductCardProps) {
+export default function ProductCard({ product, onClick, variants, showStats = false }: ProductCardProps) {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const hasPrice = product.price && product.price.trim() !== '';
+  const [isHovered, setIsHovered] = React.useState(false);
   
   // Ensure images is always an array
   const images = Array.isArray(product.images) ? product.images : [];
@@ -40,6 +44,8 @@ export default function ProductCard({ product, onClick, variants }: ProductCardP
     <motion.button
       variants={variants}
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         background: 'linear-gradient(145deg, rgba(26, 20, 16, 0.6), rgba(20, 15, 12, 0.8))',
         backdropFilter: 'blur(30px)',
@@ -95,42 +101,192 @@ export default function ProductCard({ product, onClick, variants }: ProductCardP
           pointerEvents: 'none',
         }} />
         
-        {/* Featured Badge - Minimal & Elegant */}
+        {/* Featured Badge - Elegant Glass Design */}
         {product.featured && (
-          <div style={{
-            position: 'absolute',
-            top: '20px',
-            [isRTL ? 'left' : 'right']: '20px',
-            width: '8px',
-            height: '8px',
-            background: '#e8c76f',
-            borderRadius: '50%',
-            boxShadow: '0 0 0 3px rgba(232, 199, 111, 0.2), 0 0 12px rgba(232, 199, 111, 0.6)',
-            animation: 'pulse 2s ease-in-out infinite',
-          }} />
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ 
+              opacity: 1,
+              scale: 1
+            }}
+            transition={{ 
+              duration: 0.5, 
+              ease: [0.25, 0.46, 0.45, 0.94]
+            }}
+            style={{
+              position: 'absolute',
+              top: '20px',
+              [isRTL ? 'left' : 'right']: '20px',
+              background: 'rgba(0, 0, 0, 0.4)',
+              backdropFilter: 'blur(16px) saturate(150%)',
+              WebkitBackdropFilter: 'blur(16px) saturate(150%)',
+              padding: isHovered ? '0.5rem 1.1rem 0.5rem 0.5rem' : '0.5rem',
+              borderRadius: isHovered ? '50px' : '50%',
+              width: isHovered ? 'auto' : '40px',
+              height: '40px',
+              border: '1px solid rgba(232, 199, 111, 0.25)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(232, 199, 111, 0.1)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: isHovered ? '0.5rem' : '0',
+              zIndex: 10,
+              overflow: 'hidden',
+              whiteSpace: 'nowrap' as const,
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            {/* Subtle Glow */}
+            <motion.div 
+              animate={{
+                opacity: isHovered ? 0.4 : 0.2,
+              }}
+              transition={{ duration: 0.4 }}
+              style={{
+                position: 'absolute',
+                inset: '-1px',
+                background: 'radial-gradient(circle at center, rgba(232, 199, 111, 0.2), transparent 70%)',
+                borderRadius: '50px',
+                pointerEvents: 'none',
+                zIndex: -1,
+              }} 
+            />
+            
+            {/* Icon */}
+            <motion.div
+              animate={{ 
+                rotate: isHovered ? [0, -10, 10, -10, 0] : 0,
+              }}
+              transition={{ 
+                duration: 0.6,
+                ease: 'easeInOut'
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Sparkles 
+                size={16} 
+                style={{ 
+                  color: '#e8c76f',
+                  filter: 'drop-shadow(0 0 6px rgba(232, 199, 111, 0.4))',
+                  strokeWidth: 2,
+                }} 
+              />
+            </motion.div>
+            
+            {/* Text */}
+            <motion.span 
+              initial={{ opacity: 0, width: 0, marginLeft: 0 }}
+              animate={{ 
+                opacity: isHovered ? 1 : 0,
+                width: isHovered ? 'auto' : 0,
+                marginLeft: isHovered ? '0.25rem' : 0,
+              }}
+              transition={{ 
+                duration: 0.35,
+                ease: [0.4, 0, 0.2, 1],
+                opacity: { delay: isHovered ? 0.1 : 0 }
+              }}
+              style={{
+                color: '#e8c76f',
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                letterSpacing: '0.5px',
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
+                overflow: 'hidden',
+              }}
+            >
+              {isRTL ? 'قطعة مميزة' : 'Featured'}
+            </motion.span>
+          </motion.div>
         )}
         
-        {/* Price Badge - Minimal & Clean */}
-        {hasPrice && (
+        {/* Info Badges Container */}
+        <div style={{
+          position: 'absolute',
+          bottom: '20px',
+          left: '20px',
+          right: '20px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}>
+          {/* Left Side - Image Count & Likes */}
           <div style={{
-            position: 'absolute',
-            bottom: '20px',
-            [isRTL ? 'right' : 'left']: '20px',
-            background: 'rgba(0, 0, 0, 0.75)',
-            backdropFilter: 'blur(10px)',
-            padding: '0.5rem 0.9rem',
-            borderRadius: '8px',
-            border: '1px solid rgba(232, 199, 111, 0.2)',
+            display: 'flex',
+            gap: '0.5rem',
+            alignItems: 'center',
           }}>
-            <span style={{
-              color: '#e8c76f',
-              fontSize: '0.85rem',
-              fontWeight: '600',
-            }}>
-              {i18n.language === 'ar' ? product.price : product.priceEn}
-            </span>
+            {/* Image Count Badge */}
+            {showStats && images.length > 0 && (
+              <div style={{
+                background: 'rgba(0, 0, 0, 0.6)',
+                backdropFilter: 'blur(12px)',
+                padding: '0.4rem 0.65rem',
+                borderRadius: '8px',
+                border: '1px solid rgba(232, 199, 111, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+              }}>
+                <Images size={14} style={{ color: '#e8c76f' }} />
+                <span style={{
+                  color: '#e8c76f',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                }}>
+                  {images.length}
+                </span>
+              </div>
+            )}
+            
+            {/* Likes Badge */}
+            {showStats && product.likes && product.likes > 0 && (
+              <div style={{
+                background: 'rgba(0, 0, 0, 0.6)',
+                backdropFilter: 'blur(12px)',
+                padding: '0.4rem 0.65rem',
+                borderRadius: '8px',
+                border: '1px solid rgba(232, 199, 111, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+              }}>
+                <Heart size={14} style={{ color: '#e8c76f', fill: '#e8c76f' }} />
+                <span style={{
+                  color: '#e8c76f',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                }}>
+                  {product.likes}
+                </span>
+              </div>
+            )}
           </div>
-        )}
+          
+          {/* Right Side - Price Badge */}
+          {hasPrice && (
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.75)',
+              backdropFilter: 'blur(10px)',
+              padding: '0.5rem 0.9rem',
+              borderRadius: '8px',
+              border: '1px solid rgba(232, 199, 111, 0.2)',
+            }}>
+              <span style={{
+                color: '#e8c76f',
+                fontSize: '0.85rem',
+                fontWeight: '600',
+              }}>
+                {i18n.language === 'ar' ? product.price : product.priceEn}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Content */}

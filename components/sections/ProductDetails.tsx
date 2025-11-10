@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Check, ArrowRight, ZoomIn, Share2, Heart, ChevronLeft, ChevronRight, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Check, ArrowRight, ZoomIn, Share2, Heart, ChevronLeft, ChevronRight, Star, Sparkles } from 'lucide-react';
 import { PageType } from '@/app/page';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
@@ -47,8 +48,40 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
   const productImages = product && Array.isArray(product.images) ? product.images : [];
   const firstImage = productImages[0] || '';
 
+  // Generate URL slug for the product (always use English name for consistency)
+  const generateSlug = (nameEn: string) => {
+    return nameEn
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .trim();
+  };
+
+  // Update URL when product is loaded (only once, not on language change)
+  useEffect(() => {
+    if (product) {
+      const slug = generateSlug(product.nameEn);
+      const newUrl = `/caftans/${slug}`;
+      
+      // Update browser URL without page reload
+      if (typeof window !== 'undefined' && window.location.pathname !== newUrl) {
+        window.history.replaceState(
+          { productId: product.id },
+          '',
+          newUrl
+        );
+      }
+    }
+  }, [product]);
+
   useEffect(() => {
     fetchProduct();
+    // Cleanup on unmount
+    return () => {
+      setProduct(null);
+      setLoading(true);
+    };
   }, [productId]);
 
   const fetchProduct = async () => {
@@ -255,10 +288,10 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
 
   return (
     <div style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
-      {/* Hero Section with Breadcrumb */}
+      {/* Enhanced Hero Section with Breadcrumb */}
       <section style={{
-        height: '45vh',
-        minHeight: '300px',
+        height: '50vh',
+        minHeight: '400px',
         position: 'relative',
         overflow: 'hidden',
         display: 'flex',
@@ -291,19 +324,74 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
           </>
         )}
         
+        {/* Animated Background Elements */}
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.4, 0.2],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          style={{
+            position: 'absolute',
+            top: '10%',
+            left: '5%',
+            width: '250px',
+            height: '250px',
+            background: 'radial-gradient(circle, rgba(232, 199, 111, 0.15) 0%, transparent 70%)',
+            borderRadius: '50%',
+            filter: 'blur(60px)',
+            zIndex: 1,
+          }}
+        />
+        <motion.div
+          animate={{
+            scale: [1.2, 1, 1.2],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+          style={{
+            position: 'absolute',
+            bottom: '10%',
+            right: '5%',
+            width: '300px',
+            height: '300px',
+            background: 'radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%)',
+            borderRadius: '50%',
+            filter: 'blur(80px)',
+            zIndex: 1,
+          }}
+        />
+
         {/* Content */}
-        <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-          {/* Breadcrumb */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.75rem',
-            marginBottom: '2rem',
-            marginTop: '2rem',
-            color: 'rgba(232, 199, 111, 0.7)',
-            fontSize: '0.95rem',
-          }}>
+        <div className="container" style={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+          {/* Breadcrumb with Badge Style */}
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.6rem 1.2rem',
+              background: 'rgba(0, 0, 0, 0.4)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(232, 199, 111, 0.3)',
+              borderRadius: '50px',
+              marginBottom: '2rem',
+              marginTop: '2rem',
+              color: 'rgba(232, 199, 111, 0.8)',
+              fontSize: '0.9rem',
+            }}>
             <button
               onClick={() => navigateTo('home')}
               style={{
@@ -337,29 +425,29 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
             <span style={{ color: 'var(--color-gold)' }}>
               {product ? (i18n.language === 'ar' ? product.name : product.nameEn) : '...'}
             </span>
-          </div>
+          </motion.div>
 
-          {/* Product Name in Hero */}
+          {/* Product Name in Hero with Enhanced Style */}
           {product && (
-            <h1 style={{
-              fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-              fontWeight: '800',
-              background: 'linear-gradient(135deg, #f5e6c8 0%, #e8c76f 25%, #d4af37 50%, #c9a961 75%, #e8c76f 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              backgroundSize: '200% auto',
-              animation: 'shimmer 3s linear infinite',
-              textShadow: '0 4px 12px rgba(232, 199, 111, 0.3)',
-              letterSpacing: '1px',
-              marginTop: '1.5rem',
-              marginBottom: '1.5rem',
-              lineHeight: '1.2',
-              maxWidth: '900px',
-              margin: '1.5rem auto',
-            }}>
-              {i18n.language === 'ar' ? product.name : product.nameEn}
-            </h1>
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              style={{
+                fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+                fontWeight: 'bold',
+                background: 'linear-gradient(135deg, #f5e6c8, #e8c76f, #d4af37)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                textShadow: '0 4px 12px rgba(232, 199, 111, 0.3)',
+                letterSpacing: '1px',
+                lineHeight: '1.2',
+                maxWidth: '900px',
+                margin: '1.5rem auto',
+              }}>
+                {i18n.language === 'ar' ? product.name : product.nameEn}
+            </motion.h1>
           )}
 
           {product?.featured && (
@@ -377,7 +465,7 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
               boxShadow: '0 4px 12px rgba(232, 199, 111, 0.2)',
             }}>
               <Star size={16} fill="var(--color-gold)" />
-              <span>{i18n.language === 'ar' ? 'قفطان مميز' : 'Featured Caftan'}</span>
+              <span>{i18n.language === 'ar' ? 'قطعة مميزة' : 'Featured Caftan'}</span>
             </div>
           )}
           

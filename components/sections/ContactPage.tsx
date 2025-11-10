@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Instagram, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Instagram, MapPin, Send, Sparkles } from 'lucide-react';
 
 export default function ContactPage() {
   const { t, i18n } = useTranslation();
@@ -31,34 +32,138 @@ export default function ContactPage() {
   };
 
   return (
-    <div>
-      {/* Hero */}
-      <section className="hero" style={{ minHeight: '50vh' }}>
+    <div style={{
+      background: 'linear-gradient(180deg, #0a0808 0%, #1a1410 50%, #0a0808 100%)',
+      minHeight: '100vh',
+    }}>
+      {/* Hero with Enhanced Background */}
+      <section className="hero" style={{ 
+        minHeight: '60vh',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Animated Background Gradient */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'radial-gradient(circle at 40% 40%, rgba(232, 199, 111, 0.1) 0%, transparent 50%), radial-gradient(circle at 60% 70%, rgba(212, 175, 55, 0.08) 0%, transparent 50%)',
+        }} />
+        
         <div className="hero-bg">
-          <img src="/images/about.jpg" alt="Contact" />
-          <div className="hero-overlay"></div>
+          <img src="/images/about.jpg" alt="Contact" style={{
+            filter: 'brightness(0.6) contrast(1.1)',
+          }} />
+          <div className="hero-overlay" style={{
+            background: 'linear-gradient(135deg, rgba(10, 8, 8, 0.9) 0%, rgba(26, 20, 16, 0.8) 50%, rgba(10, 8, 8, 0.95) 100%)',
+          }}></div>
         </div>
 
-        <div className="container">
-          <div className="hero-content" style={{ maxWidth: '600px' }}>
-            <span className="hero-badge">{i18n.language === 'ar' ? 'تواصلي معنا' : 'Contact Us'}</span>
-            <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)' }}>
+        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="hero-content" 
+            style={{ maxWidth: '700px' }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.6rem 1.2rem',
+                background: 'rgba(0, 0, 0, 0.4)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(232, 199, 111, 0.3)',
+                borderRadius: '50px',
+                marginBottom: '1.5rem',
+              }}
+            >
+              <Send size={16} color="#e8c76f" />
+              <span style={{ color: '#e8c76f', fontSize: '0.9rem', fontWeight: '600', letterSpacing: '0.5px' }}>
+                {i18n.language === 'ar' ? 'تواصلي معنا' : 'Contact Us'}
+              </span>
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              style={{ 
+                fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+                background: 'linear-gradient(135deg, #f5e6c8, #e8c76f, #d4af37)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                marginBottom: '1rem',
+                lineHeight: '1.5',
+                fontWeight: 'bold',
+              }}
+            >
               {t('contact.title')}
-            </h1>
-          </div>
+            </motion.h1>
+            
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              style={{
+                fontSize: '1.15rem',
+                color: 'rgba(232, 199, 111, 0.8)',
+                lineHeight: '1.8',
+              }}
+            >
+              {i18n.language === 'ar' 
+                ? 'نحن هنا للإجابة على استفساراتكم'
+                : 'We are here to answer your questions'}
+            </motion.p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section className="section" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
-        <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
+      {/* Contact Section with Enhanced Design */}
+      <section className="section" style={{ 
+        paddingTop: '5rem', 
+        paddingBottom: '6rem',
+        position: 'relative',
+        background: 'linear-gradient(180deg, rgba(26, 20, 16, 0.4) 0%, rgba(10, 8, 8, 0.6) 100%)',
+      }}>
+        {/* Decorative Elements */}
+        <div style={{
+          position: 'absolute',
+          top: '20%',
+          right: '10%',
+          width: '300px',
+          height: '300px',
+          background: 'radial-gradient(circle, rgba(232, 199, 111, 0.06) 0%, transparent 70%)',
+          borderRadius: '50%',
+          filter: 'blur(60px)',
+        }} />
+        
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '4rem', alignItems: 'start' }}>
             {/* Contact Info */}
-            <div>
-              <h2 style={{ fontSize: '2rem', color: 'var(--color-cream)', marginBottom: '2rem' }}>
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 style={{ 
+                fontSize: '2.5rem', 
+                background: 'linear-gradient(135deg, #f5e6c8, #e8c76f)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                marginBottom: '1.5rem',
+                fontWeight: '700',
+              }}>
                 {i18n.language === 'ar' ? 'تواصلي معنا' : 'Get in Touch'}
               </h2>
-              <p style={{ color: 'var(--color-light-gold)', marginBottom: '2.5rem', lineHeight: '1.8' }}>
+              <p style={{ color: 'rgba(232, 199, 111, 0.8)', marginBottom: '3rem', lineHeight: '1.9', fontSize: '1.1rem' }}>
                 {i18n.language === 'ar' 
                   ? 'نسعد بالتواصل معكم عبر أي من القنوات التالية'
                   : 'We are happy to connect with you through any of the following channels'}
@@ -149,10 +254,23 @@ export default function ContactPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Contact Form */}
-            <div>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              style={{
+                padding: '3rem',
+                background: 'rgba(0, 0, 0, 0.4)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '24px',
+                border: '1.5px solid rgba(232, 199, 111, 0.2)',
+                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+              }}
+            >
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 <div>
                   <label style={{ display: 'block', color: 'var(--color-cream)', fontWeight: '600', marginBottom: '0.5rem' }}>
@@ -238,7 +356,7 @@ export default function ContactPage() {
                   </p>
                 )}
               </form>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>

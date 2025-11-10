@@ -8,7 +8,7 @@ const resources = {
         home: 'الرئيسية',
         about: 'عن لونا',
         collection: 'القفاطين',
-        contact: 'اتصل بنا',
+        contact: 'اتصلي بنا',
       },
       home: {
         hero: {
@@ -25,7 +25,7 @@ const resources = {
         subtitle: 'تشكيلة فاخرة',
       },
       contact: {
-        title: 'اتصل بنا',
+        title: 'اتصلي بنا',
       },
     },
   },

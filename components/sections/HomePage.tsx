@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -26,6 +27,7 @@ interface Product {
 }
 
 export default function HomePage({ navigateTo }: HomePageProps) {
+  const router = useRouter();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const [isMobile, setIsMobile] = useState(false);
@@ -47,6 +49,27 @@ export default function HomePage({ navigateTo }: HomePageProps) {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Generate URL slug for navigation (always use English name for consistency)
+  const generateSlug = (nameEn: string) => {
+    return nameEn
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .trim();
+  };
+
+  // Navigate to product with SEO-friendly URL (optimized for speed)
+  const navigateToProduct = (productId: string) => {
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      const slug = generateSlug(product.nameEn);
+      // Use prefetch for faster navigation
+      router.prefetch(`/caftans/${slug}`);
+      router.push(`/caftans/${slug}`);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -203,7 +226,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
                     key={product.id}
                     product={product}
                     variants={itemVariants}
-                    onClick={() => navigateTo('product', product.id)}
+                    onClick={() => navigateToProduct(product.id)}
                   />
                 ))}
               </>

@@ -308,7 +308,7 @@ export default function EditProductPage() {
                     style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: 'var(--color-gold)' }}
                   />
                   <Star size={18} color="var(--color-gold)" fill={formData.featured ? 'var(--color-gold)' : 'none'} />
-                  <span style={{ color: 'var(--color-cream)' }}>قفطان مميز</span>
+                  <span style={{ color: 'var(--color-cream)' }}>قطعة مميزة</span>
                 </label>
 
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
