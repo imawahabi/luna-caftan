@@ -244,8 +244,11 @@ export default function ProductCard({ product, onClick, variants, showStats = fa
               </div>
             )}
             
-            {/* Likes Badge */}
-            {showStats && product.likes && product.likes > 0 && (
+            {/* Likes Badge - Only show if likes exist and greater than 0 */}
+            {showStats && 
+             product.likes !== undefined && 
+             product.likes !== null && 
+             Number(product.likes) > 0 && (
               <div style={{
                 background: 'rgba(0, 0, 0, 0.6)',
                 backdropFilter: 'blur(12px)',
