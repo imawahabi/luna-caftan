@@ -8,6 +8,10 @@ interface Product {
   details: string;
   detailsEn: string;
   images?: string | string[] | null;
+  views?: number;
+  likes?: number;
+  tags?: string;
+  tagsEn?: string;
   [key: string]: any;
 }
 
@@ -35,6 +39,26 @@ export async function GET(request: Request) {
     const products = await prisma.product.findMany({
       where: isAdmin ? {} : { active: true },
       orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        nameEn: true,
+        description: true,
+        descriptionEn: true,
+        price: true,
+        priceEn: true,
+        details: true,
+        detailsEn: true,
+        images: true,
+        featured: true,
+        active: true,
+        likes: true,
+        tags: true,
+        tagsEn: true,
+        views: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     // Parse JSON strings back to arrays
@@ -43,6 +67,8 @@ export async function GET(request: Request) {
       details: JSON.parse(product.details),
       detailsEn: JSON.parse(product.detailsEn),
       images: parseImages(product.images),
+      tags: product.tags ? JSON.parse(product.tags as string) : [],
+      tagsEn: product.tagsEn ? JSON.parse(product.tagsEn as string) : [],
     }));
 
     return NextResponse.json(parsedProducts);
@@ -79,6 +105,8 @@ export async function POST(request: Request) {
       detailsEn,
       images,
       featured,
+      tags,
+      tagsEn,
     } = body;
 
     // Validate required fields
@@ -101,6 +129,8 @@ export async function POST(request: Request) {
         detailsEn: JSON.stringify(detailsEn || []),
         images: JSON.stringify(images || []),
         featured: featured || false,
+        tags: JSON.stringify(tags || []),
+        tagsEn: JSON.stringify(tagsEn || []),
       },
     });
 
@@ -109,6 +139,8 @@ export async function POST(request: Request) {
       details: JSON.parse(product.details),
       detailsEn: JSON.parse(product.detailsEn),
       images: parseImages(product.images),
+      tags: JSON.parse(product.tags as string),
+      tagsEn: product.tagsEn ? JSON.parse(product.tagsEn as string) : [],
     });
   } catch (error) {
     console.error('Error creating product:', error);

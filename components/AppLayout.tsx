@@ -5,6 +5,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ScrollToTopButton from '@/components/ScrollToTopButton';
+import BottomNavigation from '@/components/BottomNavigation';
+import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 import { PageType } from '@/app/page';
 
 interface AppLayoutProps {
@@ -49,6 +51,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {children}
       <Footer navigateTo={navigateTo} />
       <ScrollToTopButton />
+      <BottomNavigation />
+      <PWAInstallPrompt />
     </div>
   );
 }

@@ -143,17 +143,15 @@ export default function HomePage({ navigateTo }: HomePageProps) {
                 {i18n.language === 'ar' ? <ArrowLeft size={20} /> : <ArrowRight size={20} />}
               </button>
               
-              <a 
-                href="https://wa.me/96569059697" 
-                target="_blank" 
-                rel="noopener noreferrer"
+              <button 
+                onClick={() => navigateTo('contact')}
                 className="btn btn-outline"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
                 <span>{i18n.language === 'ar' ? 'تواصلي معنا' : 'Contact Us'}</span>
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -213,6 +211,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
                     product={product}
                     variants={itemVariants}
                     onClick={() => navigateToProduct(product.id)}
+                    showTags={false}
                   />
                 ))}
               </>
@@ -233,13 +232,15 @@ export default function HomePage({ navigateTo }: HomePageProps) {
         </div>
       </motion.section>
 
-      {/* About Preview */}
+      {/* About Preview - Professional & Minimal */}
       <motion.section
         className="section"
         style={{ 
-          background: 'linear-gradient(180deg, #1a1410 0%, #0a0a0a 100%)',
+          background: '#0a0a0a',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          borderTop: '1px solid rgba(212, 175, 55, 0.1)',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.1)',
         }}
         variants={sectionVariants}
         initial="hidden"
@@ -247,36 +248,160 @@ export default function HomePage({ navigateTo }: HomePageProps) {
         viewport={{ once: true, amount: isMobile ? 0.01 : 0.2 }}
       >
         <div className="container">
-          <div className="section-header" style={{ marginBottom: '4rem' }}>
-            <span className="section-badge">{i18n.language === 'ar' ? 'قصتنا' : 'Our Story'}</span>
-            <h2 className="section-title">{t('about.title')}</h2>
+          {/* Minimal Header */}
+          <div style={{ 
+            textAlign: 'center',
+            maxWidth: '700px',
+            margin: '0 auto',
+            marginBottom: isMobile ? '3rem' : '5rem',
+          }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              style={{
+                display: 'inline-block',
+                marginBottom: '1.5rem',
+              }}
+            >
+              <div style={{
+                width: '60px',
+                height: '1px',
+                background: 'linear-gradient(90deg, transparent, var(--color-gold), transparent)',
+                margin: '0 auto 1.5rem',
+              }} />
+              <h2 style={{
+                fontSize: isMobile ? '2rem' : '2.5rem',
+                fontWeight: '400',
+                color: 'var(--color-cream)',
+                letterSpacing: '2px',
+                marginBottom: '1rem',
+              }}>
+                {t('about.title')}
+              </h2>
+              <p style={{
+                fontSize: '0.95rem',
+                color: 'var(--color-light-gold)',
+                opacity: 0.7,
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+              }}>
+                {i18n.language === 'ar' ? 'من فاس إلى الكويت' : 'From Fes to Kuwait'}
+              </p>
+            </motion.div>
           </div>
 
           <div style={{ 
             display: 'grid',
             gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-            gap: '5rem',
-            alignItems: 'center'
+            gap: isMobile ? '3rem' : '5rem',
+            alignItems: 'center',
+            maxWidth: '1200px',
+            margin: '0 auto',
           }}>
-            {/* Elegant Image Section */}
-            {!isMobile && (
-              <motion.div
-                style={{
-                  position: 'relative',
-                  height: '400px',
-                }}
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
-              >
-                {/* Main Image */}
+            {/* Professional Image Section with Elegant Frame */}
+            <motion.div
+              style={{
+                position: 'relative',
+                height: isMobile ? '350px' : '450px',
+                order: isMobile ? 1 : (isRTL ? 2 : 1),
+              }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.02 }}
+            >
+              {/* Main Frame Container */}
+              <div style={{
+                position: 'relative',
+                height: '100%',
+                padding: '12px',
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(232, 199, 111, 0.05))',
+                transition: 'all 0.4s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(232, 199, 111, 0.08)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(232, 199, 111, 0.05)';
+              }}>
+                {/* Outer Border */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  transition: 'border-color 0.4s ease',
+                }} className="frame-outer" />
+                
+                {/* Corner Accents */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '50px',
+                  height: '50px',
+                  borderTop: '2px solid var(--color-gold)',
+                  borderLeft: '2px solid var(--color-gold)',
+                  opacity: 0.6,
+                  transition: 'opacity 0.4s ease',
+                }} className="corner-accent" />
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                  width: '50px',
+                  height: '50px',
+                  borderTop: '2px solid var(--color-gold)',
+                  borderRight: '2px solid var(--color-gold)',
+                  opacity: 0.6,
+                  transition: 'opacity 0.4s ease',
+                }} className="corner-accent" />
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  width: '50px',
+                  height: '50px',
+                  borderBottom: '2px solid var(--color-gold)',
+                  borderLeft: '2px solid var(--color-gold)',
+                  opacity: 0.6,
+                  transition: 'opacity 0.4s ease',
+                }} className="corner-accent" />
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  width: '50px',
+                  height: '50px',
+                  borderBottom: '2px solid var(--color-gold)',
+                  borderRight: '2px solid var(--color-gold)',
+                  opacity: 0.6,
+                  transition: 'opacity 0.4s ease',
+                }} className="corner-accent" />
+                
+                {/* Image Container */}
                 <div style={{
                   position: 'relative',
                   height: '100%',
-                  borderRadius: '0',
                   overflow: 'hidden',
-                  boxShadow: '0 30px 90px rgba(0, 0, 0, 0.5)',
+                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
+                  transition: 'box-shadow 0.4s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 30px 80px rgba(212, 175, 55, 0.3)';
+                  const corners = e.currentTarget.parentElement?.querySelectorAll('.corner-accent');
+                  corners?.forEach(corner => (corner as HTMLElement).style.opacity = '1');
+                  const outer = e.currentTarget.parentElement?.querySelector('.frame-outer') as HTMLElement;
+                  if (outer) outer.style.borderColor = 'rgba(212, 175, 55, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 20px 60px rgba(0, 0, 0, 0.4)';
+                  const corners = e.currentTarget.parentElement?.querySelectorAll('.corner-accent');
+                  corners?.forEach(corner => (corner as HTMLElement).style.opacity = '0.6');
+                  const outer = e.currentTarget.parentElement?.querySelector('.frame-outer') as HTMLElement;
+                  if (outer) outer.style.borderColor = 'rgba(212, 175, 55, 0.3)';
                 }}>
                   <img 
                     src={settings.about_background_url || '/images/hero.jpg'} 
@@ -285,213 +410,178 @@ export default function HomePage({ navigateTo }: HomePageProps) {
                       width: '100%', 
                       height: '100%', 
                       objectFit: 'cover',
-                      filter: 'brightness(1) contrast(1.1)',
-                    }} 
+                      filter: 'grayscale(0.15) contrast(1.1) brightness(0.95)',
+                      transition: 'transform 0.6s ease, filter 0.4s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.05)';
+                      e.currentTarget.style.filter = 'grayscale(0) contrast(1.1) brightness(1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.filter = 'grayscale(0.15) contrast(1.1) brightness(0.95)';
+                    }}
                   />
                   
-                  {/* Elegant Overlay */}
+                  {/* Subtle Overlay */}
                   <div style={{
                     position: 'absolute',
                     inset: 0,
-                  }} />
-                  
-                  {/* Golden Frame - Top */}
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '1px',
-                    background: 'linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%)',
-                  }} />
-                  
-                  {/* Golden Frame - Bottom */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: '1px',
-                    background: 'linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%)',
-                  }} />
-                  
-                  {/* Golden Frame - Left */}
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    width: '1px',
-                    background: 'linear-gradient(180deg, transparent 0%, var(--color-gold) 50%, transparent 100%)',
-                  }} />
-                  
-                  {/* Golden Frame - Right */}
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    right: 0,
-                    width: '1px',
-                    background: 'linear-gradient(180deg, transparent 0%, var(--color-gold) 50%, transparent 100%)',
+                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, transparent 50%, rgba(10, 10, 10, 0.2) 100%)',
+                    pointerEvents: 'none',
                   }} />
                 </div>
-                
-                {/* Decorative Corner Accent */}
-                <div style={{
-                  position: 'absolute',
-                  top: '-10px',
-                  left: '-10px',
-                  width: '80px',
-                  height: '80px',
-                  border: '2px solid var(--color-gold)',
-                  borderRight: 'none',
-                  borderBottom: 'none',
-                  opacity: 0.6,
-                }} />
-                
-                <div style={{
-                  position: 'absolute',
-                  bottom: '-10px',
-                  right: '-10px',
-                  width: '80px',
-                  height: '80px',
-                  border: '2px solid var(--color-gold)',
-                  borderLeft: 'none',
-                  borderTop: 'none',
-                  opacity: 0.6,
-                }} />
-              </motion.div>
-            )}
+              </div>
+            </motion.div>
             
-            {/* Mobile Image Section */}
-            {isMobile && (
-              <motion.div
-                style={{
-                  position: 'relative',
-                  height: '250px',
-                  marginBottom: '2rem',
-                }}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-              >
-                <div style={{
-                  position: 'relative',
-                  height: '100%',
-                  borderRadius: '0',
-                  overflow: 'hidden',
-                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
-                }}>
-                  <img 
-                    src={settings.about_background_url || '/images/hero.jpg'} 
-                    alt="Luna Caftan"
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'cover',
-                      filter: 'brightness(1) contrast(1.1)',
-                    }} 
-                  />
-                  
-                  {/* Golden Frame - Mobile */}
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '1px',
-                    background: 'linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%)',
-                  }} />
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: '1px',
-                    background: 'linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%)',
-                  }} />
-                </div>
-              </motion.div>
-            )}
-            
-            <div style={{ 
-              textAlign: isRTL ? 'right' : 'left',
-              direction: isRTL ? 'rtl' : 'ltr',
-              display: 'flex', 
-              flexDirection: 'column',
-              gap: '2rem'
-            }}>
-              {/* Elegant Quote */}
+            {/* Professional Content Section */}
+            <motion.div 
+              style={{ 
+                textAlign: isRTL ? 'right' : 'left',
+                direction: isRTL ? 'rtl' : 'ltr',
+                order: isMobile ? 2 : (isRTL ? 1 : 2),
+              }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              {/* Brand Name */}
               <div style={{
-                borderLeft: isRTL ? 'none' : '3px solid var(--color-gold)',
-                borderRight: isRTL ? '3px solid var(--color-gold)' : 'none',
-                paddingLeft: isRTL ? '0' : '2rem',
-                paddingRight: isRTL ? '2rem' : '0',
-                marginBottom: '1rem',
+                marginBottom: '2rem',
+                paddingBottom: '1.5rem',
+                borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
               }}>
-                <p style={{ 
-                  fontSize: '1.25rem', 
-                  lineHeight: '1.9', 
-                  color: 'var(--color-cream)',
+                <h3 style={{
+                  fontSize: isMobile ? '1.5rem' : '1.8rem',
                   fontWeight: '300',
-                  fontStyle: 'italic',
+                  color: 'var(--color-gold)',
+                  letterSpacing: '3px',
+                  marginBottom: '0.5rem',
                 }}>
-                  {i18n.language === 'ar'
-                    ? 'بوتيك لونا متخصص في تقديم قفاطين مغربية فخمة وأصيلة من مدينة فاس العريقة. نختار كل قطعة بعناية لتجمع بين جمال التراث المغربي والذوق العصري، مع الحرص على جودة الصناعة اليدوية في كل تفصيلة.'
-                    : 'Luna Boutique specializes in offering luxury Moroccan caftans from the historic city of Fes. We carefully select each piece to combine the beauty of Moroccan heritage with contemporary taste, ensuring quality handcraftsmanship in every detail.'}
+                  {i18n.language === 'ar' ? 'بوتيك لونا' : 'LUNA CAFTAN'}
+                </h3>
+                <p style={{
+                  fontSize: '0.9rem',
+                  color: 'var(--color-light-gold)',
+                  opacity: 0.7,
+                  letterSpacing: '1px',
+                }}>
+                  {i18n.language === 'ar' ? 'قفاطين مغربية فاخرة - الكويت' : 'Luxury Moroccan Caftans - Kuwait'}
                 </p>
               </div>
 
-              {/* Boutique Info */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-                padding: '1.5rem 0',
-                borderTop: '1px solid rgba(232, 199, 111, 0.2)',
-                borderBottom: '1px solid rgba(232, 199, 111, 0.2)',
-              }}>
-                <div style={{
-                  width: '4px',
-                  height: '50px',
-                  background: 'linear-gradient(180deg, var(--color-gold), transparent)',
-                }} />
-                <div>
-                  <p style={{ 
-                    fontSize: '1.1rem',
-                    fontWeight: '600',
-                    color: 'var(--color-gold)',
-                    marginBottom: '0.3rem',
-                    letterSpacing: '0.5px',
-                  }}>
-                    {i18n.language === 'ar' ? 'بوتيك لونا' : 'Luna Boutique'}
-                  </p>
-                  <p style={{
-                    fontSize: '0.9rem',
-                    color: 'var(--color-light-gold)',
-                    opacity: 0.8,
-                  }}>
-                    {i18n.language === 'ar' ? 'قفاطين مغربية فاخرة من فاس' : 'Luxury Moroccan Caftans from Fes'}
-                  </p>
-                </div>
+              {/* Main Description - Quoted from About Page */}
+              <div>
+                <p style={{ 
+                  fontSize: isMobile ? '1.05rem' : '1.15rem', 
+                  lineHeight: '2', 
+                  color: 'var(--color-cream)',
+                  fontWeight: '300',
+                  marginBottom: '2rem',
+                  opacity: 0.95,
+                }}>
+                  {i18n.language === 'ar'
+                    ? 'بوتيك لونا متخصص في نقل تراث القفطان المغربي الأصيل من مدينة فاس العريقة إلى الكويت. نختار كل قطعة بعناية لتجمع بين الأصالة المغربية والذوق العصري، مع الحرص على جودة الصناعة اليدوية التي تميز كل قفطان.'
+                    : 'Luna Boutique specializes in bringing authentic Moroccan caftan heritage from the historic city of Fes to Kuwait. We carefully select each piece to blend Moroccan authenticity with contemporary taste, while ensuring the quality of handcraftsmanship that distinguishes every caftan.'}
+                </p>
+                
+                <p style={{ 
+                  fontSize: isMobile ? '0.95rem' : '1.05rem', 
+                  lineHeight: '1.9', 
+                  color: 'rgba(232, 199, 111, 0.8)',
+                  fontWeight: '300',
+                  fontStyle: 'italic',
+                  paddingLeft: isRTL ? '0' : '1.5rem',
+                  paddingRight: isRTL ? '1.5rem' : '0',
+                  borderLeft: isRTL ? 'none' : '2px solid rgba(212, 175, 55, 0.3)',
+                  borderRight: isRTL ? '2px solid rgba(212, 175, 55, 0.3)' : 'none',
+                }}>
+                  {i18n.language === 'ar'
+                    ? 'نؤمن بأن القفطان المغربي يحمل قصة وتراثاً عريقاً. لذلك نحرص على اختيار قطع تعكس جمال الصناعة اليدوية الفاسية.'
+                    : 'We believe that the Moroccan caftan carries a story and rich heritage. Therefore, we carefully select pieces that reflect the beauty of Fassi craftsmanship.'}
+                </p>
               </div>
 
+              {/* Stats Grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '2rem',
+                marginBottom: '2.5rem',
+                paddingTop: '2rem',
+                borderTop: '1px solid rgba(212, 175, 55, 0.1)',
+              }}>
+                {[
+                  { 
+                    numberAr: '100%',
+                    numberEn: '100%',
+                    labelAr: 'صناعة يدوية',
+                    labelEn: 'Handcrafted'
+                  },
+                  { 
+                    numberAr: 'الكويت',
+                    numberEn: 'Kuwait',
+                    labelAr: 'المقر',
+                    labelEn: 'Based in'
+                  },
+                  { 
+                    numberAr: 'فاس',
+                    numberEn: 'Fes',
+                    labelAr: 'المصدر',
+                    labelEn: 'From'
+                  }
+                ].map((stat, index) => (
+                  <motion.div
+                    key={index}
+                    style={{
+                      textAlign: 'center',
+                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 + (index * 0.1) }}
+                    viewport={{ once: true }}
+                  >
+                    <div style={{
+                      fontSize: isMobile ? '1.3rem' : '1.5rem',
+                      fontWeight: '300',
+                      color: 'var(--color-gold)',
+                      marginBottom: '0.5rem',
+                      letterSpacing: '1px',
+                    }}>
+                      {i18n.language === 'ar' ? stat.numberAr : stat.numberEn}
+                    </div>
+                    <div style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--color-light-gold)',
+                      opacity: 0.7,
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}>
+                      {i18n.language === 'ar' ? stat.labelAr : stat.labelEn}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Simple CTA */}
               <button 
                 onClick={() => navigateTo('about')} 
-                className="btn btn-primary" 
+                className="btn btn-outline"
                 style={{ 
-                  marginTop: '1rem',
-                  alignSelf: isRTL ? 'flex-end' : 'flex-start',
                   display: 'inline-flex',
                   gap: '0.8rem',
-                  flexDirection: isRTL ? 'row-reverse' : 'row'
+                  flexDirection: isRTL ? 'row-reverse' : 'row',
+                  fontSize: '0.95rem',
+                  padding: '0.9rem 2rem',
+                  letterSpacing: '1px',
+                  textTransform: 'uppercase',
                 }}
               >
-                <span>{i18n.language === 'ar' ? 'اعرف المزيد' : 'Learn More'}</span>
+                <span>{i18n.language === 'ar' ? 'المزيد عنا' : 'Learn More'}</span>
                 {isRTL ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
               </button>
-            </div>
+            </motion.div>
           </div>
         </div>
       </motion.section>

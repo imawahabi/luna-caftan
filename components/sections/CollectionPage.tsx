@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useProducts } from '@/lib/products-context';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Sparkles, Star, Filter, Grid, List, TrendingUp, Search, SortAsc, Eye, Heart, ImageIcon } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Sparkles, Star, Filter, Grid, List, TrendingUp, Search, SortAsc, Eye, Heart, ImageIcon, Tag, Bookmark } from 'lucide-react';
 import { PageType } from '@/app/page';
 import ProductCard from '@/components/ProductCard';
 import ProductCardSkeleton from '@/components/ProductCardSkeleton';
+import WishlistButton from '@/components/WishlistButton';
+import { getProductTags } from '@/lib/tags-config';
 import { 
   StatsSkeleton, 
   SearchSkeleton, 
@@ -31,6 +33,8 @@ interface Product {
   featured: boolean;
   likes?: number;
   details?: string[];
+  tags?: string[];
+  views?: number;
 }
 
 export default function CollectionPage({ navigateTo }: CollectionPageProps) {
@@ -71,13 +75,22 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
       filtered = filtered.filter(p => p.featured);
     }
     
-    // Apply search
+    // Apply search (name + tags)
     if (searchQuery.trim()) {
-      filtered = filtered.filter(p => 
-        (i18n.language === 'ar' ? p.name : p.nameEn)
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(p => {
+        // Search in name
+        const nameMatch = (i18n.language === 'ar' ? p.name : p.nameEn)
           .toLowerCase()
-          .includes(searchQuery.toLowerCase())
-      );
+          .includes(query);
+        
+        // Search in tags
+        const tagsMatch = p.tags && p.tags.some(tag => 
+          tag.toLowerCase().includes(query)
+        );
+        
+        return nameMatch || tagsMatch;
+      });
     }
     
     setFilteredProducts(filtered);
@@ -588,6 +601,7 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
                             product={product}
                             onClick={() => navigateToProduct(product.id)}
                             showStats={true}
+                            showWishlist={true}
                           />
                         </motion.div>
                       );
@@ -649,6 +663,24 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
                               e.currentTarget.style.transform = 'scale(1)';
                             }}
                           />
+                          
+                          {/* Wishlist Button on Image - List View */}
+                          <div 
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              position: 'absolute',
+                              top: '1rem',
+                              [isRTL ? 'right' : 'left']: '1rem',
+                              zIndex: 20,
+                            }}
+                          >
+                            <WishlistButton 
+                              productId={product.id}
+                              isHovered={false}
+                              size={40}
+                            />
+                          </div>
+                          
                           {product.featured && (
                             <motion.div 
                               initial={{ opacity: 0, scale: 0.8 }}
@@ -758,7 +790,7 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
                               <p style={{
                                 color: 'rgba(232, 199, 111, 0.7)',
                                 lineHeight: '1.8',
-                                marginBottom: '1.5rem',
+                                marginBottom: '1rem',
                                 fontSize: '1rem',
                                 display: '-webkit-box',
                                 WebkitLineClamp: 3,
@@ -767,6 +799,54 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
                               }}>
                                 {i18n.language === 'ar' ? product.description : product.descriptionEn}
                               </p>
+                            )}
+                            
+                            {/* Tags - List View */}
+                            {getProductTags(product, i18n.language as 'ar' | 'en').length > 0 && (
+                              <div style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: '0.5rem',
+                                marginBottom: isMobile ? '0' : '1.5rem',
+                              }}>
+                                {getProductTags(product, i18n.language as 'ar' | 'en').slice(0, isMobile ? 2 : 4).map((tag: string, index: number) => (
+                                  <div
+                                    key={index}
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '0.25rem',
+                                      padding: '0.25rem 0.75rem',
+                                      background: 'rgba(232, 199, 111, 0.1)',
+                                      border: '1px solid rgba(232, 199, 111, 0.25)',
+                                      borderRadius: '12px',
+                                      fontSize: '0.75rem',
+                                      color: 'rgba(232, 199, 111, 0.8)',
+                                      fontWeight: '500',
+                                    }}
+                                  >
+                                    <Tag size={10} />
+                                    <span>{tag}</span>
+                                  </div>
+                                ))}
+                                {getProductTags(product, i18n.language as 'ar' | 'en').length > (isMobile ? 2 : 4) && (
+                                  <div
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      padding: '0.25rem 0.75rem',
+                                      background: 'rgba(232, 199, 111, 0.05)',
+                                      border: '1px solid rgba(232, 199, 111, 0.15)',
+                                      borderRadius: '12px',
+                                      fontSize: '0.75rem',
+                                      color: 'rgba(232, 199, 111, 0.6)',
+                                      fontWeight: '500',
+                                    }}
+                                  >
+                                    +{getProductTags(product, i18n.language as 'ar' | 'en').length - (isMobile ? 2 : 4)}
+                                  </div>
+                                )}
+                              </div>
                             )}
                           </div>
 

@@ -4,7 +4,8 @@
  * Generate SEO-friendly URL slug from product name
  * Always uses English name for consistency across languages
  */
-export function generateProductSlug(nameEn: string): string {
+export function generateProductSlug(product: { nameEn: string } | string): string {
+  const nameEn = typeof product === 'string' ? product : product.nameEn;
   return nameEn
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '') // Remove special characters

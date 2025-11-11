@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProducts } from '@/lib/products-context';
+import { useWishlist } from '@/lib/wishlist-context';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Heart, Star, ShoppingBag, Zap, Crown, Gem, ChevronLeft, ChevronRight, X, Eye, Sparkles, ZoomIn, Share2, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Heart, Star, ShoppingBag, Zap, Crown, Gem, ChevronLeft, ChevronRight, X, Eye, Sparkles, ZoomIn, Share2, Check, Tag, Bookmark } from 'lucide-react';
 import { PageType } from '@/app/page';
+import WishlistButton from '@/components/WishlistButton';
+import { getProductTags } from '@/lib/tags-config';
 import { 
   TitleSkeleton, 
   PriceSkeleton, 
@@ -29,6 +32,9 @@ type Product = {
   images: string[];
   featured: boolean;
   likes?: number;
+  tags?: string[];
+  tagsEn?: string[];
+  views?: number;
 };
 
 interface ProductDetailsProps {
@@ -39,7 +45,8 @@ interface ProductDetailsProps {
 export default function ProductDetails({ productId, navigateTo }: ProductDetailsProps) {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
-  const { products: allProducts, loading: productsLoading } = useProducts();
+  const { products: allProducts, loading: productsLoading, incrementViews } = useProducts();
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -52,6 +59,14 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
   const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   const [initialPinchDistance, setInitialPinchDistance] = useState<number | null>(null);
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+
+  // Memoized similar products - must be after all useState hooks
+  const similarProducts = useMemo(() => {
+    return allProducts
+      .filter(p => p.id !== productId)
+      .slice(0, 4);
+  }, [allProducts, productId]);
 
   const LIKED_PRODUCTS_STORAGE_KEY = 'luna-liked-products';
 
@@ -133,6 +148,11 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
       setProduct(foundProduct);
       setLikesCount(foundProduct.likes ?? 0);
       setHasLiked(getStoredLikedProductIds().includes(foundProduct.id));
+      
+      // Increment views using context function
+      incrementViews(foundProduct.id).catch(error => {
+        console.error('Failed to increment views:', error);
+      });
     } else {
       setHasLiked(false);
     }
@@ -313,10 +333,6 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
     );
     window.open(`https://wa.me/96569059697?text=${message}`, '_blank');
   };
-
-  const similarProducts = allProducts
-    .filter(p => p.id !== productId)
-    .slice(0, 4);
 
   const shareProduct = () => {
     if (navigator.share && product) {
@@ -673,7 +689,7 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
                       <ZoomIn size={20} />
                     </div>
 
-                    {/* Like & Share Buttons */}
+                    {/* Like, Share & Wishlist Buttons */}
                     <div style={{
                       position: 'absolute',
                       top: '20px',
@@ -744,6 +760,7 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
                         )}
                       </div>
 
+                      {/* Share Button */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -767,6 +784,40 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
                       >
                         <Share2 size={20} />
                       </button>
+
+                      {/* Wishlist Button - Custom Design */}
+                      <div style={{ position: 'relative' }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleWishlist(product.id);
+                          }}
+                          style={{
+                            background: isInWishlist(product.id) ? 'rgba(232, 199, 111, 0.9)' : 'rgba(0, 0, 0, 0.7)',
+                            backdropFilter: 'blur(10px)',
+                            border: isInWishlist(product.id) ? 'none' : 'none',
+                            padding: '0.75rem',
+                            borderRadius: '50%',
+                            color: 'white',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.3s',
+                            boxShadow: isInWishlist(product.id) ? '0 4px 12px rgba(232, 199, 111, 0.4)' : 'none',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        >
+                          <Bookmark 
+                            size={20} 
+                            fill={isInWishlist(product.id) ? '#fff' : 'none'}
+                            style={{
+                              transition: 'all 0.3s',
+                            }}
+                          />
+                        </button>
+                      </div>
                     </div>
 
                     {/* Navigation Arrows */}
@@ -936,6 +987,56 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
                   {i18n.language === 'ar' ? product.description : product.descriptionEn}
                 </p>
               </div>
+
+              {/* Tags */}  
+              {getProductTags(product, i18n.language as 'ar' | 'en').length > 0 && (
+                <div style={{ marginBottom: '2.5rem' }}>
+                  <h3 style={{ 
+                    color: 'var(--color-cream)', 
+                    fontSize: '1.3rem', 
+                    fontWeight: '600',
+                    marginBottom: '1rem',
+                  }}>
+                    {i18n.language === 'ar' ? 'الوسوم' : 'Tags'}
+                  </h3>
+                  <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '0.75rem',
+                  }}>
+                    {getProductTags(product, i18n.language as 'ar' | 'en').map((tag: string, index: number) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.05, duration: 0.3 }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          padding: '0.4rem 0.9rem',
+                          background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.15), rgba(212, 175, 55, 0.1))',
+                          border: '1.5px solid rgba(232, 199, 111, 0.3)',
+                          borderRadius: '14px',
+                          fontSize: '0.85rem',
+                          color: '#e8c76f',
+                          fontWeight: '500',
+                          cursor: 'default',
+                          transition: 'all 0.3s ease',
+                        }}
+                        whileHover={{
+                          scale: 1.05,
+                          borderColor: 'rgba(232, 199, 111, 0.5)',
+                          background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.2), rgba(212, 175, 55, 0.15))',
+                        }}
+                      >
+                        <Tag size={14} style={{ flexShrink: 0 }} />
+                        <span>{tag}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Details */}
               {((i18n.language === 'ar' && product.details && product.details.length > 0) || 
@@ -1128,104 +1229,340 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
             {/* Similar Products Grid */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '2rem',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: '1.5rem',
+              maxWidth: '1400px',
+              margin: '0 auto',
             }}>
               {similarProducts.map((similarProduct) => {
                 const hasPrice = similarProduct.price && similarProduct.price.trim() !== '';
+                const hasTags = similarProduct.tags && similarProduct.tags.length > 0;
+                const hasViews = typeof similarProduct.views === 'number' && similarProduct.views > 0;
+                const hasLikes = typeof similarProduct.likes === 'number' && similarProduct.likes > 0;
+                const hasStats = hasViews || hasLikes;
                 
                 return (
-                  <button
+                  <motion.div
                     key={similarProduct.id}
-                    onClick={() => navigateTo('product', similarProduct.id)}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    whileHover={{ y: -8 }}
                     style={{
-                      background: 'linear-gradient(145deg, rgba(26, 20, 16, 0.6), rgba(20, 15, 12, 0.8))',
-                      backdropFilter: 'blur(30px)',
-                      border: '1px solid rgba(232, 199, 111, 0.15)',
-                      borderRadius: '24px',
-                      overflow: 'hidden',
-                      cursor: 'pointer',
-                      textAlign: isRTL ? 'right' : 'left',
-                      direction: isRTL ? 'rtl' : 'ltr',
-                      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                       position: 'relative',
-                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => navigateTo('product', similarProduct.id)}
+                    onMouseEnter={() => setHoveredCard(similarProduct.id)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                  >
+                    {/* Glow Effect on Hover */}
+                    <div style={{
+                      position: 'absolute',
+                      inset: '-2px',
+                      background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.15), rgba(212, 175, 55, 0.1))',
+                      borderRadius: '22px',
+                      opacity: 0,
+                      transition: 'opacity 0.3s ease',
+                      pointerEvents: 'none',
+                      zIndex: 0,
+                    }}
+                    className="card-glow"
+                    />
+                    
+                    <div style={{
+                      background: 'linear-gradient(145deg, rgba(26, 20, 16, 0.5), rgba(20, 15, 12, 0.6))',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(232, 199, 111, 0.12)',
+                      borderRadius: '20px',
+                      overflow: 'hidden',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      position: 'relative',
+                      zIndex: 1,
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-12px) scale(1.02)';
-                      e.currentTarget.style.borderColor = 'rgba(232, 199, 111, 0.4)';
-                      e.currentTarget.style.boxShadow = '0 20px 48px rgba(232, 199, 111, 0.3)';
+                      e.currentTarget.style.borderColor = 'rgba(232, 199, 111, 0.35)';
+                      e.currentTarget.style.boxShadow = '0 16px 48px rgba(232, 199, 111, 0.25), 0 0 0 1px rgba(232, 199, 111, 0.1)';
+                      e.currentTarget.style.transform = 'scale(1.01)';
+                      const glow = e.currentTarget.parentElement?.querySelector('.card-glow') as HTMLElement;
+                      if (glow) glow.style.opacity = '1';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                      e.currentTarget.style.borderColor = 'rgba(232, 199, 111, 0.15)';
-                      e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.4)';
+                      e.currentTarget.style.borderColor = 'rgba(232, 199, 111, 0.12)';
+                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.transform = 'scale(1)';
+                      const glow = e.currentTarget.parentElement?.querySelector('.card-glow') as HTMLElement;
+                      if (glow) glow.style.opacity = '0';
                     }}
-                  >
-                    {/* Image */}
-                    <div style={{ 
-                      height: '350px', 
-                      position: 'relative', 
-                      overflow: 'hidden',
-                    }}>
-                      <img 
-                        src={similarProduct.images[0]} 
-                        alt={i18n.language === 'ar' ? similarProduct.name : similarProduct.nameEn} 
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          transition: 'transform 0.6s',
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.08)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                      />
-                      
-                      {/* Price Badge */}
-                      {hasPrice && (
+                    >
+                      {/* Image Container */}
+                      <div style={{ 
+                        height: '320px', 
+                        position: 'relative', 
+                        overflow: 'hidden',
+                        background: 'rgba(0, 0, 0, 0.3)',
+                      }}>
+                        {/* Gradient Overlay */}
                         <div style={{
                           position: 'absolute',
-                          top: '16px',
-                          [isRTL ? 'right' : 'left']: '16px',
-                          background: 'linear-gradient(135deg, #e8c76f, #d4af37)',
-                          padding: '0.5rem 1rem',
-                          borderRadius: '50px',
-                          color: '#1a1410',
-                          fontSize: '0.9rem',
-                          fontWeight: '700',
-                          boxShadow: '0 6px 20px rgba(232, 199, 111, 0.4)',
-                        }}>
-                          {i18n.language === 'ar' ? similarProduct.price : similarProduct.priceEn}
-                        </div>
-                      )}
-                    </div>
+                          inset: 0,
+                          background: 'linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(10, 8, 8, 0.8) 100%)',
+                          zIndex: 1,
+                          pointerEvents: 'none',
+                        }} />
+                        
+                        <img 
+                          src={similarProduct.images[0]} 
+                          alt={i18n.language === 'ar' ? similarProduct.name : similarProduct.nameEn} 
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            transition: 'transform 0.5s ease',
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        />
+                        
+                        {/* Wishlist Button */}
+                        <WishlistButton 
+                          productId={similarProduct.id}
+                          isHovered={hoveredCard === similarProduct.id}
+                          size={40}
+                        />
+                        
+                        {/* Featured Badge */}
+                        {similarProduct.featured && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '12px',
+                            [isRTL ? 'left' : 'right']: '12px',
+                            background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.95), rgba(126, 34, 206, 0.95))',
+                            backdropFilter: 'blur(10px)',
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '12px',
+                            color: 'white',
+                            fontSize: '0.75rem',
+                            fontWeight: '600',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                            zIndex: 2,
+                            boxShadow: '0 4px 12px rgba(147, 51, 234, 0.4)',
+                          }}>
+                            <Star size={12} fill="white" />
+                            <span>{i18n.language === 'ar' ? 'مميز' : 'Featured'}</span>
+                          </div>
+                        )}
+                        
+                        {/* Price Badge */}
+                        {hasPrice && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '12px',
+                            [isRTL ? 'right' : 'left']: '12px',
+                            background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.95), rgba(212, 175, 55, 0.95))',
+                            backdropFilter: 'blur(10px)',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '12px',
+                            color: '#1a1410',
+                            fontSize: '0.85rem',
+                            fontWeight: '700',
+                            zIndex: 2,
+                            boxShadow: '0 4px 12px rgba(232, 199, 111, 0.4)',
+                          }}>
+                            {i18n.language === 'ar' ? similarProduct.price : similarProduct.priceEn}
+                          </div>
+                        )}
 
-                    {/* Content */}
-                    <div style={{ padding: '1.5rem' }}>
-                      <h3 style={{ 
-                        fontSize: '1.3rem',
-                        fontWeight: '700',
-                        color: 'var(--color-gold)',
-                        marginBottom: '0.5rem',
-                        lineHeight: '1.3',
+                        {/* Stats Bar - Only show if there are actual stats > 0 */}
+                        {hasStats && (
+                          <div style={{
+                            position: 'absolute',
+                            bottom: '12px',
+                            left: '12px',
+                            right: '12px',
+                            display: 'flex',
+                            gap: '0.5rem',
+                            zIndex: 2,
+                          }}>
+                            {/* Views - Only show if > 0 */}
+                            {hasViews && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.3 }}
+                                style={{
+                                  background: 'rgba(0, 0, 0, 0.75)',
+                                  backdropFilter: 'blur(12px)',
+                                  padding: '0.45rem 0.8rem',
+                                  borderRadius: '10px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.35rem',
+                                  fontSize: '0.75rem',
+                                  color: '#e8c76f',
+                                  fontWeight: '600',
+                                  border: '1px solid rgba(232, 199, 111, 0.2)',
+                                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                                }}
+                              >
+                                <Eye size={13} strokeWidth={2.5} />
+                                <span>{similarProduct.views}</span>
+                              </motion.div>
+                            )}
+                            
+                            {/* Likes - Only show if > 0 */}
+                            {hasLikes && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.3 }}
+                                style={{
+                                  background: 'rgba(0, 0, 0, 0.75)',
+                                  backdropFilter: 'blur(12px)',
+                                  padding: '0.45rem 0.8rem',
+                                  borderRadius: '10px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.35rem',
+                                  fontSize: '0.75rem',
+                                  color: '#ef4444',
+                                  fontWeight: '600',
+                                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                                }}
+                              >
+                                <Heart size={13} fill="#ef4444" strokeWidth={2.5} />
+                                <span>{similarProduct.likes}</span>
+                              </motion.div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div style={{ 
+                        padding: '1.25rem',
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.75rem',
                       }}>
-                        {i18n.language === 'ar' ? similarProduct.name : similarProduct.nameEn}
-                      </h3>
-                      
-                      <p style={{ 
-                        fontSize: '0.9rem',
-                        color: 'rgba(232, 199, 111, 0.7)',
-                        lineHeight: '1.6',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        margin: 0,
-                      }}>
-                        {i18n.language === 'ar' ? similarProduct.description : similarProduct.descriptionEn}
-                      </p>
+                        {/* Title */}
+                        <h3 style={{ 
+                          fontSize: '1.1rem',
+                          fontWeight: '600',
+                          color: 'var(--color-cream)',
+                          marginBottom: '0',
+                          lineHeight: '1.4',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}>
+                          {i18n.language === 'ar' ? similarProduct.name : similarProduct.nameEn}
+                        </h3>
+                        
+                        {/* Description */}
+                        <p style={{ 
+                          fontSize: '0.85rem',
+                          color: 'rgba(232, 199, 111, 0.6)',
+                          lineHeight: '1.5',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          margin: 0,
+                          flex: 1,
+                        }}>
+                          {i18n.language === 'ar' ? similarProduct.description : similarProduct.descriptionEn}
+                        </p>
+
+                        {/* Tags */}
+                        {hasTags && similarProduct.tags && (
+                          <div style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: '0.4rem',
+                            marginTop: 'auto',
+                          }}>
+                            {getProductTags(similarProduct, i18n.language as 'ar' | 'en').slice(0, 3).map((tag: string, index: number) => (
+                              <motion.span
+                                key={index}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.05 }}
+                                whileHover={{ scale: 1.05 }}
+                                style={{
+                                  padding: '0.35rem 0.75rem',
+                                  background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.1), rgba(212, 175, 55, 0.08))',
+                                  border: '1px solid rgba(232, 199, 111, 0.25)',
+                                  borderRadius: '10px',
+                                  fontSize: '0.7rem',
+                                  color: 'rgba(232, 199, 111, 0.85)',
+                                  fontWeight: '600',
+                                  cursor: 'default',
+                                  transition: 'all 0.2s ease',
+                                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                }}
+                              >
+                                {tag}
+                              </motion.span>
+                            ))}
+                            {similarProduct.tags.length > 3 && (
+                              <span style={{
+                                padding: '0.35rem 0.75rem',
+                                background: 'rgba(232, 199, 111, 0.06)',
+                                border: '1px solid rgba(232, 199, 111, 0.18)',
+                                borderRadius: '10px',
+                                fontSize: '0.7rem',
+                                color: 'rgba(232, 199, 111, 0.6)',
+                                fontWeight: '600',
+                              }}>
+                                +{similarProduct.tags.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* View Button */}
+                        <motion.div 
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            paddingTop: '0.75rem',
+                            borderTop: '1px solid rgba(232, 199, 111, 0.1)',
+                            marginTop: 'auto',
+                          }}
+                          whileHover={{ x: isRTL ? -3 : 3 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <span style={{
+                            fontSize: '0.85rem',
+                            color: 'var(--color-gold)',
+                            fontWeight: '600',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                            transition: 'all 0.2s ease',
+                          }}>
+                            {i18n.language === 'ar' ? 'عرض التفاصيل' : 'View Details'}
+                            <motion.span
+                              animate={{ x: isRTL ? [-2, 0, -2] : [2, 0, 2] }}
+                              transition={{ duration: 1.5, repeat: Infinity }}
+                            >
+                              {isRTL ? <ArrowLeft size={14} strokeWidth={2.5} /> : <ArrowRight size={14} strokeWidth={2.5} />}
+                            </motion.span>
+                          </span>
+                        </motion.div>
+                      </div>
                     </div>
-                  </button>
+                  </motion.div>
                 );
               })}
             </div>

@@ -3,7 +3,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Eye, Sparkles, Heart, Images } from 'lucide-react';
+import { Eye, Sparkles, Heart, Images, Tag } from 'lucide-react';
+import WishlistButton from './WishlistButton';
+import { getProductTags } from '@/lib/tags-config';
 
 interface Product {
   id: string;
@@ -17,6 +19,7 @@ interface Product {
   featured: boolean;
   likes?: number;
   details?: string[];
+  tags?: string[];
 }
 
 interface ProductCardProps {
@@ -24,9 +27,11 @@ interface ProductCardProps {
   onClick: () => void;
   variants?: any;
   showStats?: boolean;
+  showWishlist?: boolean; // New prop to control wishlist button visibility
+  showTags?: boolean; // New prop to control tags visibility
 }
 
-export default function ProductCard({ product, onClick, variants, showStats = false }: ProductCardProps) {
+export default function ProductCard({ product, onClick, variants, showStats = false, showWishlist = false, showTags = true }: ProductCardProps) {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const hasPrice = product.price && product.price.trim() !== '';
@@ -42,7 +47,7 @@ export default function ProductCard({ product, onClick, variants, showStats = fa
   }
 
   return (
-    <motion.button
+    <motion.div
       variants={variants}
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
@@ -101,6 +106,15 @@ export default function ProductCard({ product, onClick, variants, showStats = fa
           background: 'linear-gradient(to top, rgba(10, 10, 10, 0.95) 0%, rgba(10, 10, 10, 0.3) 40%, transparent 70%)',
           pointerEvents: 'none',
         }} />
+        
+        {/* Wishlist Button */}
+        {showWishlist && (
+          <WishlistButton 
+            productId={product.id}
+            isHovered={isHovered}
+            size={40}
+          />
+        )}
         
         {/* Featured Badge - Elegant Glass Design */}
         {product.featured && (
@@ -290,13 +304,6 @@ export default function ProductCard({ product, onClick, variants, showStats = fa
                 }}>
                   {product.likes}
                 </span>
-                <span style={{ 
-                  fontSize: '0.65rem', 
-                  opacity: 0.7,
-                  color: '#e74c3c'
-                }}>
-                  {i18n.language === 'ar' ? 'إعجابات' : 'Likes'}
-                </span>
               </motion.div>
             )}
             
@@ -385,7 +392,7 @@ export default function ProductCard({ product, onClick, variants, showStats = fa
         <p style={{ 
           fontSize: '0.95rem',
           color: 'rgba(232, 199, 111, 0.7)',
-          marginBottom: '1.5rem',
+          marginBottom: '1rem',
           lineHeight: '1.6',
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -394,6 +401,54 @@ export default function ProductCard({ product, onClick, variants, showStats = fa
         }}>
           {i18n.language === 'ar' ? product.description : product.descriptionEn}
         </p>
+        
+        {/* Tags */}
+        {showTags && product.tags && product.tags.length > 0 && (
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '0.5rem',
+            marginBottom: '1.5rem',
+          }}>
+            {getProductTags(product, i18n.language as 'ar' | 'en').slice(0, 3).map((tag: string, index: number) => (
+              <div
+                key={index}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.25rem',
+                  padding: '0.25rem 0.75rem',
+                  background: 'rgba(232, 199, 111, 0.1)',
+                  border: '1px solid rgba(232, 199, 111, 0.25)',
+                  borderRadius: '12px',
+                  fontSize: '0.75rem',
+                  color: 'rgba(232, 199, 111, 0.8)',
+                  fontWeight: '500',
+                }}
+              >
+                <Tag size={10} />
+                <span>{tag}</span>
+              </div>
+            ))}
+            {getProductTags(product, i18n.language as 'ar' | 'en').length > 3 && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0.25rem 0.75rem',
+                  background: 'rgba(232, 199, 111, 0.05)',
+                  border: '1px solid rgba(232, 199, 111, 0.15)',
+                  borderRadius: '12px',
+                  fontSize: '0.75rem',
+                  color: 'rgba(232, 199, 111, 0.6)',
+                  fontWeight: '500',
+                }}
+              >
+                +{product.tags.length - 3}
+              </div>
+            )}
+          </div>
+        )}
         
         {/* View Details - Minimal Button */}
         <div style={{
@@ -428,6 +483,6 @@ export default function ProductCard({ product, onClick, variants, showStats = fa
           />
         </div>
       </div>
-    </motion.button>
+    </motion.div>
   );
 }

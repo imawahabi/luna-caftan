@@ -2,11 +2,13 @@
 
 import { useEffect, useState, type CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { 
   Trash2, Edit, Eye, EyeOff, 
   Package, TrendingUp, Star,
-  Calendar, Images, List
+  Calendar, Images, List, Heart, Tag
 } from 'lucide-react';
+import { getProductTags } from '@/lib/tags-config';
 import DeleteConfirmModal from '@/components/DeleteConfirmModal';
 import AddCaftanButton from '@/components/AddCaftanButton';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -23,6 +25,10 @@ interface Product {
   createdAt?: string;
   details?: string[];
   detailsEn?: string[];
+  tags?: string[];
+  tagsEn?: string[];
+  views?: number;
+  likes?: number;
 }
 
 interface Stats {
@@ -34,6 +40,7 @@ interface Stats {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { i18n } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<Stats>({ total: 0, active: 0, inactive: 0, featured: 0 });
@@ -329,16 +336,16 @@ export default function DashboardPage() {
                   )}
                   {product.featured && (
                     <div style={{
-                      background: 'rgba(147, 51, 234, 0.95)',
+                      background: 'rgba(12, 63, 129, 0.2)',
                       backdropFilter: 'blur(10px)',
                       color: 'white',
                       padding: '0.5rem 0.9rem',
                       borderRadius: '20px',
                       fontSize: '0.8rem',
                       fontWeight: '600',
-                      boxShadow: '0 4px 12px rgba(147, 51, 234, 0.4)',
+                      boxShadow: '0 4px 12px rgba(3, 6, 48, 0.24)',
                     }}>
-                      ⭐ مميز
+                      ⭐ قطعة مميزة
                     </div>
                   )}
                 </div>
@@ -389,100 +396,221 @@ export default function DashboardPage() {
                 </button>
               </div>
 
-              <div style={{ padding: '1.25rem', position: 'relative' }}>
+              <div style={{ padding: '1.5rem', position: 'relative' }}>
                 {!product.active && (
                   <div style={{
                     position: 'absolute',
                     inset: 0,
                     background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.25), rgba(15, 23, 42, 0.35))',
                     pointerEvents: 'none',
+                    borderRadius: '0 0 16px 16px',
                   }} />
                 )}
+                
+                {/* Header Section */}
                 <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.35rem',
-                  marginBottom: '1rem',
+                  marginBottom: '1.25rem',
+                  paddingBottom: '1rem',
+                  borderBottom: '1px solid rgba(232, 199, 111, 0.1)',
                 }}>
                   <h3 style={{
-                    fontSize: '1.1rem',
+                    fontSize: '1.2rem',
                     color: 'var(--color-cream)',
-                    fontWeight: '600',
+                    fontWeight: '700',
+                    marginBottom: '0.5rem',
+                    lineHeight: '1.4',
                   }}>
                     {product.name}
                   </h3>
                   <span style={{
-                    color: 'rgba(226, 232, 240, 0.75)',
-                    fontSize: '0.9rem',
+                    color: 'rgba(226, 232, 240, 0.7)',
+                    fontSize: '0.95rem',
                     fontWeight: '500',
-                    letterSpacing: '0.3px',
+                    letterSpacing: '0.5px',
+                    display: 'block',
                   }}>
                     {product.nameEn}
                   </span>
                 </div>
 
+                {/* Stats Grid */}
                 <div style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '0.5rem',
-                  marginBottom: '1rem',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gap: '0.75rem',
+                  marginBottom: '1.25rem',
                 }}>
-                  <span style={metaBadgeStyle}>
-                    <Images size={14} />
-                    {imageCount} صور
-                  </span>
-                  <span style={metaBadgeStyle}>
-                    <List size={14} />
-                    {detailsCount} تفاصيل
-                  </span>
-                  <span style={metaBadgeStyle}>
-                    <Calendar size={14} />
-                    {formatDate(product.createdAt)}
-                  </span>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: '0.75rem 0.5rem',
+                    background: 'rgba(232, 199, 111, 0.08)',
+                    border: '1px solid rgba(232, 199, 111, 0.2)',
+                    borderRadius: '10px',
+                  }}>
+                    <Images size={16} style={{ color: 'var(--color-gold)', marginBottom: '0.35rem' }} />
+                    <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--color-cream)' }}>{imageCount}</span>
+                    <span style={{ fontSize: '0.7rem', color: 'rgba(232, 199, 111, 0.7)' }}></span>
+                  </div>
+                  
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: '0.75rem 0.5rem',
+                    background: 'rgba(232, 199, 111, 0.08)',
+                    border: '1px solid rgba(232, 199, 111, 0.2)',
+                    borderRadius: '10px',
+                  }}>
+                    <List size={16} style={{ color: 'var(--color-gold)', marginBottom: '0.35rem' }} />
+                    <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--color-cream)' }}>{detailsCount}</span>
+                    <span style={{ fontSize: '0.7rem', color: 'rgba(232, 199, 111, 0.7)' }}></span>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: '0.75rem 0.5rem',
+                    background: 'rgba(59, 130, 246, 0.08)',
+                    border: '1px solid rgba(59, 130, 246, 0.2)',
+                    borderRadius: '10px',
+                  }}>
+                    <Eye size={16} style={{ color: '#60a5fa', marginBottom: '0.35rem' }} />
+                    <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--color-cream)' }}>{product.views || 0}</span>
+                    <span style={{ fontSize: '0.7rem', color: 'rgba(59, 130, 246, 0.7)' }}></span>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: '0.75rem 0.5rem',
+                    background: 'rgba(239, 68, 68, 0.08)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    borderRadius: '10px',
+                  }}>
+                    <Heart size={16} style={{ color: '#ef4444', marginBottom: '0.35rem' }} fill="#ef4444" />
+                    <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--color-cream)' }}>{product.likes || 0}</span>
+                    <span style={{ fontSize: '0.7rem', color: 'rgba(239, 68, 68, 0.7)' }}></span>
+                  </div>
                 </div>
 
-                <p style={{
-                  color: 'var(--color-gold)',
-                  fontSize: '1rem',
-                  marginBottom: '1.25rem',
-                  fontWeight: '500',
-                }}>
-                  {product.price}
-                </p>
+                {/* Tags Section */}
+                {getProductTags(product, i18n.language as 'ar' | 'en').length > 0 && (
+                  <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '0.4rem',
+                    marginBottom: '1rem',
+                  }}>
+                    {/* Arabic Tags */}
+                    {product.tags && product.tags.length > 0 && (
+                      <>
+                        {product.tags.slice(0, 2).map((tag: string, index: number) => (
+                          <span
+                            key={`ar-${index}`}
+                            style={{
+                              padding: '0.3rem 0.7rem',
+                              background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.12), rgba(212, 175, 55, 0.08))',
+                              border: '1px solid rgba(232, 199, 111, 0.25)',
+                              borderRadius: '10px',
+                              fontSize: '0.75rem',
+                              color: 'rgba(232, 199, 111, 0.9)',
+                              fontWeight: '500',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.25rem',
+                            }}
+                          >
+                            <Tag size={11} />
+                            {tag}
+                          </span>
+                        ))}
+                      </>
+                    )}
 
+                    {/* English Tags */}
+                    {product.tagsEn && product.tagsEn.length > 0 && (
+                      <>
+                        {product.tagsEn.slice(0, 2).map((tag: string, index: number) => (
+                          <span
+                            key={`en-${index}`}
+                            style={{
+                              padding: '0.3rem 0.7rem',
+                              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(22, 163, 74, 0.08))',
+                              border: '1px solid rgba(34, 197, 94, 0.25)',
+                              borderRadius: '10px',
+                              fontSize: '0.75rem',
+                              color: 'rgba(34, 197, 94, 0.9)',
+                              fontWeight: '500',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.25rem',
+                            }}
+                          >
+                            <Tag size={11} />
+                            {tag}
+                          </span>
+                        ))}
+                      </>
+                    )}
+
+                    {/* Show more indicator */}
+                    {((product.tags?.length || 0) + (product.tagsEn?.length || 0)) > 4 && (
+                      <span style={{
+                        padding: '0.3rem 0.7rem',
+                        background: 'rgba(232, 199, 111, 0.06)',
+                        border: '1px solid rgba(232, 199, 111, 0.18)',
+                        borderRadius: '10px',
+                        fontSize: '0.75rem',
+                        color: 'rgba(232, 199, 111, 0.6)',
+                        fontWeight: '600',
+                      }}>
+                        +{((product.tags?.length || 0) + (product.tagsEn?.length || 0)) - 4}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+
+                {/* Action Buttons */}
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
-                  gap: '0.5rem',
+                  gap: '0.75rem',
                 }}>
                   {/* Edit Button */}
                   <button
                     onClick={() => router.push(`/admin/dashboard/products/${product.id}`)}
                     style={{
-                      padding: '0.75rem',
+                      padding: '0.875rem',
                       background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.1))',
                       border: '1px solid rgba(59, 130, 246, 0.4)',
-                      borderRadius: '10px',
+                      borderRadius: '12px',
                       color: '#60a5fa',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '0.5rem',
-                      fontSize: '0.875rem',
-                      fontWeight: '600',
-                      transition: 'all 0.3s ease',
+                      fontSize: '0.9rem',
+                      fontWeight: '700',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 6px 16px rgba(59, 130, 246, 0.25)';
+                      e.currentTarget.style.transform = 'translateY(-3px)';
+                      e.currentTarget.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.3)';
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(37, 99, 235, 0.15))';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'translateY(0)';
                       e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.1))';
                     }}
                   >
-                    <Edit size={16} />
+                    <Edit size={18} />
                     <span>تعديل</span>
                   </button>
 
@@ -490,30 +618,32 @@ export default function DashboardPage() {
                   <button
                     onClick={() => setDeleteModal({ isOpen: true, product })}
                     style={{
-                      padding: '0.75rem',
+                      padding: '0.875rem',
                       background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1))',
                       border: '1px solid rgba(239, 68, 68, 0.4)',
-                      borderRadius: '10px',
+                      borderRadius: '12px',
                       color: '#f87171',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '0.5rem',
-                      fontSize: '0.875rem',
-                      fontWeight: '600',
-                      transition: 'all 0.3s ease',
+                      fontSize: '0.9rem',
+                      fontWeight: '700',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 6px 16px rgba(239, 68, 68, 0.25)';
+                      e.currentTarget.style.transform = 'translateY(-3px)';
+                      e.currentTarget.style.boxShadow = '0 8px 20px rgba(239, 68, 68, 0.3)';
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.15))';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'translateY(0)';
                       e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1))';
                     }}
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={18} />
                     <span>حذف</span>
                   </button>
                 </div>

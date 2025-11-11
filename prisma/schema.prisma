@@ -35,8 +35,14 @@ model Product {
   featured      Boolean  @default(false)
   active        Boolean  @default(true)
   likes         Int      @default(0)
+  tags          String   @default("[]") // JSON string array for Arabic tags
+  tagsEn        String   @default("[]") // JSON string array for English tags
+  views         Int      @default(0) // View count
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@index([featured])
+  @@index([views])
 }
 
 // Site Settings Model

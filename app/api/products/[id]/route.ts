@@ -28,6 +28,26 @@ export async function GET(
     const params = await context.params;
     const product = await prisma.product.findUnique({
       where: { id: params.id },
+      select: {
+        id: true,
+        name: true,
+        nameEn: true,
+        description: true,
+        descriptionEn: true,
+        price: true,
+        priceEn: true,
+        details: true,
+        detailsEn: true,
+        images: true,
+        featured: true,
+        active: true,
+        likes: true,
+        tags: true,
+        tagsEn: true,
+        views: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     if (!product) {
@@ -42,6 +62,8 @@ export async function GET(
       details: JSON.parse(product.details),
       detailsEn: JSON.parse(product.detailsEn),
       images: parseImages(product.images),
+      tags: product.tags ? JSON.parse(product.tags as string) : [],
+      tagsEn: product.tagsEn ? JSON.parse(product.tagsEn as string) : [],
     });
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -81,6 +103,8 @@ export async function PUT(
       images,
       featured,
       active,
+      tags,
+      tagsEn,
     } = body;
 
     console.log('📝 UPDATE Request for product:', params.id);
@@ -101,6 +125,28 @@ export async function PUT(
         ...(images && { images: JSON.stringify(images) }),
         ...(typeof featured !== 'undefined' && { featured }),
         ...(typeof active !== 'undefined' && { active }),
+        ...(tags && { tags: JSON.stringify(tags) }),
+        ...(tagsEn && { tagsEn: JSON.stringify(tagsEn) }),
+      },
+      select: {
+        id: true,
+        name: true,
+        nameEn: true,
+        description: true,
+        descriptionEn: true,
+        price: true,
+        priceEn: true,
+        details: true,
+        detailsEn: true,
+        images: true,
+        featured: true,
+        active: true,
+        likes: true,
+        tags: true,
+        tagsEn: true,
+        views: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
@@ -111,6 +157,8 @@ export async function PUT(
       details: JSON.parse(product.details),
       detailsEn: JSON.parse(product.detailsEn),
       images: parseImages(product.images),
+      tags: product.tags ? JSON.parse(product.tags as string) : [],
+      tagsEn: product.tagsEn ? JSON.parse(product.tagsEn as string) : [],
     });
   } catch (error) {
     console.error('Error updating product:', error);

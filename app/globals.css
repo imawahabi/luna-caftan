@@ -1722,9 +1722,27 @@ footer::after {
   display: none;
 }
 
+/* Desktop Wishlist Button - visible only on desktop */
+.desktop-wishlist-btn {
+  display: flex !important;
+}
+
+/* Mobile Wishlist Button - visible only on mobile */
+.mobile-wishlist-btn {
+  display: none !important;
+}
+
 @media (max-width: 768px) {
   .mobile-lang-toggle {
-    display: flex;
+    display: flex !important;
+  }
+  
+  .mobile-wishlist-btn {
+    display: flex !important;
+  }
+  
+  .desktop-wishlist-btn {
+    display: none !important;
   }
   
   header nav .lang-toggle {

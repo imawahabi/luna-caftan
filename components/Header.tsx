@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/lib/language-context';
-import { Menu, X } from 'lucide-react';
+import { useWishlist } from '@/lib/wishlist-context';
+import { Menu, X, Bookmark } from 'lucide-react';
 import { PageType } from '@/app/page';
 
 interface HeaderProps {
@@ -13,7 +15,9 @@ interface HeaderProps {
 
 export default function Header({ currentPage, navigateTo }: HeaderProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const { language, toggleLanguage, isChangingLanguage } = useLanguage();
+  const { wishlistCount } = useWishlist();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -130,6 +134,45 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
               {t('nav.contact')}
             </button>
             
+            {/* Wishlist Button - Desktop (after Contact) */}
+            <button
+              onClick={() => {
+                router.push('/wishlist');
+              }}
+              className="desktop-wishlist-btn"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-cream)',
+                cursor: 'pointer',
+                fontWeight: 500,
+                position: 'relative',
+                alignItems: 'center',
+                padding: '0.5rem',
+              }}
+            >
+              <Bookmark size={20} />
+              {wishlistCount > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: '0',
+                  right: '-2px',
+                  background: 'linear-gradient(135deg, #e8c76f, #d4af37)',
+                  color: '#1a1410',
+                  fontSize: '0.65rem',
+                  fontWeight: '700',
+                  padding: '0.15rem 0.4rem',
+                  borderRadius: '10px',
+                  minWidth: '18px',
+                  textAlign: 'center',
+                  boxShadow: '0 2px 8px rgba(232, 199, 111, 0.4)',
+                  lineHeight: '1',
+                }}>
+                  {wishlistCount > 99 ? '99+' : wishlistCount}
+                </span>
+              )}
+            </button>
+            
             <button 
               onClick={toggleLanguage} 
               className="lang-toggle"
@@ -159,6 +202,44 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
               )}
             </button>
           </nav>
+
+          {/* Mobile Wishlist Button */}
+          <button
+            onClick={() => {
+              router.push('/wishlist');
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--color-cream)',
+              cursor: 'pointer',
+              position: 'relative',
+              alignItems: 'center',
+              padding: '0.5rem',
+            }}
+            className="mobile-wishlist-btn"
+          >
+            <Bookmark size={20} />
+            {wishlistCount > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: '0',
+                right: '-2px',
+                background: 'linear-gradient(135deg, #e8c76f, #d4af37)',
+                color: '#1a1410',
+                fontSize: '0.65rem',
+                fontWeight: '700',
+                padding: '0.15rem 0.4rem',
+                borderRadius: '10px',
+                minWidth: '18px',
+                textAlign: 'center',
+                boxShadow: '0 2px 8px rgba(232, 199, 111, 0.4)',
+                lineHeight: '1',
+              }}>
+                {wishlistCount > 99 ? '99+' : wishlistCount}
+              </span>
+            )}
+          </button>
 
           {/* Mobile Language Toggle */}
           <button 

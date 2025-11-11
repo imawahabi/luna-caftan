@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowRight, Plus, X, Save, Upload, Image as ImageIcon, Star, Edit as EditIcon, Eye, EyeOff } from 'lucide-react';
-import ImageUploader from '@/components/ImageUploader';
+import { ArrowRight, Plus, X, Save, Upload, Image as ImageIcon, Star, Edit as EditIcon, Eye, EyeOff, Tag } from 'lucide-react';
+import BulkImageUploader from '@/components/BulkImageUploader';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function EditProductPage() {
@@ -23,7 +23,11 @@ export default function EditProductPage() {
     images: [''],
     featured: false,
     active: true,
+    tags: [] as string[],
+    tagsEn: [] as string[],
   });
+  const [tagInput, setTagInput] = useState('');
+  const [tagInputEn, setTagInputEn] = useState('');
 
   useEffect(() => {
     fetchProduct();
@@ -47,6 +51,8 @@ export default function EditProductPage() {
         images: data.images && data.images.length > 0 ? data.images : [''],
         featured: data.featured || false,
         active: data.active !== undefined ? data.active : true,
+        tags: data.tags && Array.isArray(data.tags) ? data.tags : [],
+        tagsEn: data.tagsEn && Array.isArray(data.tagsEn) ? data.tagsEn : [],
       });
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -75,6 +81,8 @@ export default function EditProductPage() {
           details: formData.details.filter(d => d.trim()),
           detailsEn: formData.detailsEn.filter(d => d.trim()),
           images: formData.images.filter(img => img.trim()),
+          tags: formData.tags,
+          tagsEn: formData.tagsEn,
         }),
       });
 
@@ -132,6 +140,44 @@ export default function EditProductPage() {
 
   const removeImage = (index: number) => {
     setFormData({ ...formData, images: formData.images.filter((_, i) => i !== index) });
+  };
+
+  const addTag = () => {
+    const tag = tagInput.trim();
+    if (tag && !formData.tags.includes(tag)) {
+      setFormData({ ...formData, tags: [...formData.tags, tag] });
+      setTagInput('');
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setFormData({ ...formData, tags: formData.tags.filter(t => t !== tagToRemove) });
+  };
+
+  const handleTagKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addTag();
+    }
+  };
+
+  const addTagEn = () => {
+    const tag = tagInputEn.trim();
+    if (tag && !formData.tagsEn.includes(tag)) {
+      setFormData({ ...formData, tagsEn: [...formData.tagsEn, tag] });
+      setTagInputEn('');
+    }
+  };
+
+  const removeTagEn = (tagToRemove: string) => {
+    setFormData({ ...formData, tagsEn: formData.tagsEn.filter(t => t !== tagToRemove) });
+  };
+
+  const handleTagKeyPressEn = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addTagEn();
+    }
   };
 
   if (fetching) {
@@ -458,7 +504,7 @@ export default function EditProductPage() {
               </div>
             </div>
 
-            {/* Images Section */}
+            {/* Tags Section - Arabic & English Combined */}
             <div style={{
               background: 'rgba(26, 20, 16, 0.6)',
               backdropFilter: 'blur(10px)',
@@ -467,71 +513,169 @@ export default function EditProductPage() {
               padding: '2rem',
             }}>
               <h2 style={{ fontSize: '1.3rem', color: 'var(--color-cream)', marginBottom: '1.5rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <ImageIcon size={24} color="var(--color-gold)" />
-                <span>صور القفطان</span>
+                <Tag size={24} color="var(--color-gold)" />
+                <span>الوسوم (Tags)</span>
               </h2>
 
-              {formData.images.map((image, index) => (
-                <div key={index} style={{ marginBottom: '1.5rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <label style={{ color: 'var(--color-cream)', fontSize: '0.9rem', fontWeight: '500' }}>
-                      الصورة {index + 1}
-                    </label>
-                    {formData.images.length > 1 && (
+              {/* Arabic Tags Input */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={labelStyle}>
+                  الوسوم بالعربية
+                </label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input
+                    type="text"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyPress={handleTagKeyPress}
+                    placeholder="مثال: فاخر، مطرز، عصري (اضغط Enter للإضافة)"
+                    style={{ ...inputStyle, flex: 1 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={addTag}
+                    style={{
+                      padding: '0.875rem 1.5rem',
+                      background: 'rgba(232, 199, 111, 0.15)',
+                      border: '1px solid rgba(232, 199, 111, 0.3)',
+                      borderRadius: '8px',
+                      color: 'var(--color-gold)',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    إضافة
+                  </button>
+                </div>
+              </div>
+
+              {/* English Tags Input */}
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={labelStyle}>
+                  English Tags
+                </label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input
+                    type="text"
+                    value={tagInputEn}
+                    onChange={(e) => setTagInputEn(e.target.value)}
+                    onKeyPress={handleTagKeyPressEn}
+                    placeholder="Example: Luxury, Embroidered, Modern (Press Enter to add)"
+                    style={{ ...inputStyle, flex: 1, direction: 'ltr' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={addTagEn}
+                    style={{
+                      padding: '0.875rem 1.5rem',
+                      background: 'rgba(232, 199, 111, 0.15)',
+                      border: '1px solid rgba(232, 199, 111, 0.3)',
+                      borderRadius: '8px',
+                      color: 'var(--color-gold)',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              {/* Combined Tags Display */}
+              {(formData.tags.length > 0 || formData.tagsEn.length > 0) && (
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '0.5rem',
+                  padding: '1rem',
+                  background: 'rgba(0, 0, 0, 0.3)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(232, 199, 111, 0.15)',
+                }}>
+                  {/* Arabic Tags */}
+                  {formData.tags.map((tag, index) => (
+                    <div
+                      key={`ar-${index}`}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.5rem 1rem',
+                        background: 'rgba(232, 199, 111, 0.15)',
+                        border: '1px solid rgba(232, 199, 111, 0.3)',
+                        borderRadius: '20px',
+                        color: 'var(--color-gold)',
+                        fontSize: '0.9rem',
+                      }}
+                    >
+                      <Tag size={14} />
+                      <span>{tag}</span>
                       <button
                         type="button"
-                        onClick={() => removeImage(index)}
+                        onClick={() => removeTag(tag)}
                         style={{
-                          padding: '0.5rem 1rem',
-                          background: 'rgba(239, 68, 68, 0.1)',
-                          border: '1px solid rgba(239, 68, 68, 0.3)',
-                          borderRadius: '8px',
-                          color: '#f87171',
+                          background: 'none',
+                          border: 'none',
+                          color: 'rgba(239, 68, 68, 0.8)',
                           cursor: 'pointer',
-                          fontSize: '0.85rem',
+                          padding: '0',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '0.5rem',
                         }}
                       >
                         <X size={14} />
-                        <span>حذف</span>
                       </button>
-                    )}
-                  </div>
-                  <ImageUploader
-                    currentValue={image}
-                    onImageSelect={(url) => updateImage(index, url)}
-                    showGallery={true}
-                    label=""
-                  />
-                </div>
-              ))}
+                    </div>
+                  ))}
 
-              <button
-                type="button"
-                onClick={addImage}
-                style={{
-                  width: '100%',
-                  padding: '0.875rem',
-                  background: 'rgba(232, 199, 111, 0.1)',
-                  border: '1px solid rgba(232, 199, 111, 0.3)',
-                  borderRadius: '12px',
-                  color: 'var(--color-gold)',
-                  cursor: 'pointer',
-                  fontSize: '0.95rem',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
-                  marginTop: '1rem',
-                }}
-              >
-                <Plus size={18} />
-                <span>إضافة صورة أخرى</span>
-              </button>
+                  {/* English Tags */}
+                  {formData.tagsEn.map((tag, index) => (
+                    <div
+                      key={`en-${index}`}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.5rem 1rem',
+                        background: 'rgba(59, 130, 246, 0.15)',
+                        border: '1px solid rgba(59, 130, 246, 0.3)',
+                        borderRadius: '20px',
+                        color: '#60a5fa',
+                        fontSize: '0.9rem',
+                      }}
+                    >
+                      <Tag size={14} />
+                      <span>{tag}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeTagEn(tag)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'rgba(239, 68, 68, 0.8)',
+                          cursor: 'pointer',
+                          padding: '0',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
+
+            {/* Images Section - Using BulkImageUploader */}
+            <BulkImageUploader
+              images={formData.images}
+              onChange={(images) => setFormData({ ...formData, images })}
+            />
 
             {/* Submit Button */}
             <div style={{
