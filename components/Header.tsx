@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/lib/language-context';
@@ -19,6 +19,19 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
   const { language, toggleLanguage, isChangingLanguage } = useLanguage();
   const { wishlistCount } = useWishlist();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if screen is mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -195,10 +208,10 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
                       animation: 'spin 1s linear infinite' 
                     }}
                   />
-                  {language === 'en' ? 'العربية' : 'EN'}
+                  {language === 'en' ? (isMobile ? 'ع' : 'العربية') : 'English'}
                 </span>
               ) : (
-                language === 'en' ? 'العربية' : 'EN'
+                language === 'en' ? (isMobile ? 'ع' : 'العربية') : 'English'
               )}
             </button>
           </nav>
@@ -264,10 +277,10 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
                     animation: 'spin 1s linear infinite' 
                   }}
                 />
-                {language === 'en' ? 'العربية' : 'EN'}
+                {language === 'en' ? (isMobile ? 'ع' : 'العربية') : 'EN'}
               </span>
             ) : (
-              language === 'en' ? 'العربية' : 'EN'
+              language === 'en' ? (isMobile ? 'ع' : 'العربية') : 'EN'
             )}
           </button>
 
