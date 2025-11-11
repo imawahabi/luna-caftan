@@ -3,7 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
-  
+
+  // Hide Next.js dev indicators/badge
+  devIndicators: false,
+
   // Performance optimizations
   images: {
     remotePatterns: [
@@ -14,7 +17,7 @@ const nextConfig: NextConfig = {
     ],
     formats: ['image/webp', 'image/avif'],
   },
-  
+
   // Compress responses
   compress: true,
 };
