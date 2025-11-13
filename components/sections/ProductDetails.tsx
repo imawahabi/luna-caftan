@@ -709,7 +709,7 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
                           style={{
                             background: hasLiked ? 'rgba(231, 76, 60, 0.9)' : 'rgba(0, 0, 0, 0.7)',
                             backdropFilter: 'blur(10px)',
-                            border: hasLiked ? '2px solid rgba(255, 255, 255, 0.3)' : 'none',
+                            border: hasLiked ? 'none' : 'none',
                             padding: '0.75rem',
                             borderRadius: '50%',
                             color: 'white',
