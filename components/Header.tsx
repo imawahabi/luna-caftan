@@ -191,111 +191,106 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
             </button>
           </nav>
 
-          {/* Mobile Wishlist Button */}
-          <button
-            onClick={() => {
-              router.push('/wishlist');
-            }}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--color-cream)',
-              cursor: 'pointer',
-              position: 'relative',
-              alignItems: 'center',
-              padding: '0.5rem',
-            }}
-            className="mobile-wishlist-btn"
-          >
-            <Bookmark size={20} />
-            {wishlistCount > 0 && (
-              <span style={{
-                position: 'absolute',
-                top: '3px',
-                right: '6px',
-                background: 'linear-gradient(135deg, #e8c76f, #d4af37)',
-                color: '#1a1410',
-                fontSize: '0.65rem',
-                fontWeight: '700',
-                padding: '0.15rem 0.3rem',
-                borderRadius: '10px',
-                minWidth: '18px',
-                textAlign: 'center',
-                boxShadow: '0 2px 8px rgba(232, 199, 111, 0.4)',
-                lineHeight: '1',
-              }}>
-                {wishlistCount > 99 ? '99+' : wishlistCount}
-              </span>
-            )}
-          </button>
-
-          {/* Language Toggle - Desktop & Mobile */}
-          <motion.button 
-            onClick={changeLanguage}
-            className="lang-toggle-modern"
-            disabled={isChangingLanguage}
-            title={language === 'en' ? 'التبديل إلى العربية' : 'Switch to English'}
-            onHoverStart={() => !isMobile && setIsLangHovered(true)}
-            onHoverEnd={() => !isMobile && setIsLangHovered(false)}
-          >
-            <motion.div 
-              className="lang-toggle-container"
-              animate={{
-                borderRadius: isLangHovered && !isMobile ? '30px' : '50%',
-                width: isLangHovered && !isMobile ? 'auto' : '48px',
-                minWidth: isLangHovered && !isMobile ? '120px' : '48px',
+          {/* Mobile Icons Container */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: isMobile ? '0.5rem' : '1rem' 
+          }}>
+            {/* Mobile Wishlist Button */}
+            <button
+              onClick={() => {
+                router.push('/wishlist');
               }}
-              transition={{
-                duration: 0.35,
-                ease: [0.4, 0, 0.2, 1],
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-cream)',
+                cursor: 'pointer',
+                position: 'relative',
+                alignItems: 'center',
+                padding: isMobile ? '0.25rem' : '0.5rem',
+              }}
+              className="mobile-wishlist-btn"
+            >
+              <Bookmark size={20} />
+              {wishlistCount > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: '3px',
+                  right: '6px',
+                  background: 'linear-gradient(135deg, #e8c76f, #d4af37)',
+                  color: '#1a1410',
+                  fontSize: '0.65rem',
+                  fontWeight: '700',
+                  padding: '0.15rem 0.3rem',
+                  borderRadius: '10px',
+                  minWidth: '18px',
+                  textAlign: 'center',
+                  boxShadow: '0 2px 8px rgba(232, 199, 111, 0.4)',
+                  lineHeight: '1',
+                }}>
+                  {wishlistCount > 99 ? '99+' : wishlistCount}
+                </span>
+              )}
+            </button>
+
+            {/* Language Toggle - Desktop & Mobile */}
+            <motion.button 
+              onClick={changeLanguage}
+              className="lang-toggle-modern"
+              disabled={isChangingLanguage}
+              title={language === 'en' ? 'التبديل إلى العربية' : 'Switch to English'}
+            >
+              <motion.div 
+                className="lang-toggle-container"
+                style={{
+                  borderRadius: isMobile ? '50%' : '30px',
+                  width: isMobile ? '40px' : 'auto',
+                  minWidth: isMobile ? '40px' : '120px',
+                }}
+              >
+                {isChangingLanguage ? (
+                  <div className="lang-loading">
+                    <span className="spinner" />
+                  </div>
+                ) : (
+                  <>
+                    {/* Active Language Flag */}
+                    <div className="lang-current" style={{ gap: isMobile ? '0' : '0.75rem' }}>
+                      <motion.div
+                        className="lang-flag-wrapper"
+                      >
+                        <span className={`fi ${language === 'en' ? 'fi-sa' : 'fi-gb'} fis lang-flag`}></span>
+                      </motion.div>
+                      {!isMobile && (
+                        <motion.span 
+                          className="lang-text"
+                          style={{
+                            opacity: 1,
+                            width: 'auto',
+                          }}
+                        >
+                          {language === 'en' ? 'العربية' : 'English'}
+                        </motion.span>
+                      )}
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            </motion.button>
+
+            {/* Mobile Menu Button */}
+            <button 
+              onClick={toggleMobileMenu} 
+              className="mobile-menu-btn"
+              style={{
+                padding: isMobile ? '0.25rem' : '0.5rem',
               }}
             >
-              {isChangingLanguage ? (
-                <div className="lang-loading">
-                  <span className="spinner" />
-                </div>
-              ) : (
-                <>
-                  {/* Active Language Flag */}
-                  <div className="lang-current">
-                    <motion.div
-                      animate={{
-                        scale: isLangHovered && !isMobile ? 1.05 : 1,
-                      }}
-                      transition={{
-                        duration: 0.3,
-                        ease: [0.4, 0, 0.2, 1],
-                      }}
-                      className="lang-flag-wrapper"
-                    >
-                      <span className={`fi ${language === 'en' ? 'fi-sa' : 'fi-gb'} fis lang-flag`}></span>
-                    </motion.div>
-                    <motion.span 
-                      className="lang-text"
-                      initial={{ opacity: 0, width: 0, marginLeft: 0 }}
-                      animate={{ 
-                        opacity: isLangHovered && !isMobile ? 1 : 0,
-                        width: isLangHovered && !isMobile ? 'auto' : 0,
-                        marginLeft: isLangHovered && !isMobile ? '0.5rem' : 0,
-                      }}
-                      transition={{ 
-                        duration: 0.35,
-                        ease: [0.4, 0, 0.2, 1],
-                        opacity: { delay: isLangHovered && !isMobile ? 0.1 : 0 }
-                      }}
-                    >
-                      {language === 'en' ? 'العربية' : 'English'}
-                    </motion.span>
-                  </div>
-                </>
-              )}
-            </motion.div>
-          </motion.button>
-
-          {/* Mobile Menu Button */}
-          <button onClick={toggleMobileMenu} className="mobile-menu-btn">
-            {mobileMenuOpen ? <X size={21} /> : <Menu size={21} />}
-          </button>
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
       </header>
 

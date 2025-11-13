@@ -452,7 +452,7 @@ header nav button:hover::after {
   background: linear-gradient(135deg, 
     rgba(232, 199, 111, 0.12), 
     rgba(212, 175, 55, 0.08));
-  border: 2px solid rgba(232, 199, 111, 0.4);
+  border: 3px solid rgba(232, 199, 111, 0.4);
   color: var(--color-gold);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -564,10 +564,10 @@ header nav button:hover::after {
   display: inline-block;
 }
 
-/* Desktop: add gap only on hover so flag stays centered initially */
+/* Desktop: gap is always present for text visibility */
 @media (min-width: 769px) {
-  .lang-toggle-modern:hover .lang-current {
-    gap: 0.5rem;
+  .lang-current {
+    gap: 0.75rem !important;
   }
 }
 
@@ -579,8 +579,8 @@ html[dir='rtl'] .lang-text {
 /* Mobile - Professional Flag Only */
 @media (max-width: 768px) {
   .lang-toggle-container {
-    width: 46px;
-    height: 46px;
+    width: 46px !important;
+    height: 46px !important;
     border-radius: 50% !important;
     padding: 0;
     justify-content: center;
