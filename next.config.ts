@@ -7,6 +7,13 @@ const nextConfig: NextConfig = {
   // Hide Next.js dev indicators/badge
   devIndicators: false,
 
+  // Hide Vercel Toolbar completely
+  experimental: {
+    toolbar: {
+      enabled: false,
+    },
+  },
+
   // Performance optimizations
   images: {
     remotePatterns: [
