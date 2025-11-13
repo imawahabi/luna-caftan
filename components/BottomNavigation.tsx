@@ -17,19 +17,11 @@ export default function BottomNavigation() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const { scrollY } = useScroll();
 
-  // Hide/show on scroll
+  // Always visible on mobile - removed hide on scroll logic
   useEffect(() => {
-    const unsubscribe = scrollY.on('change', (latest) => {
-      if (latest > lastScrollY && latest > 100) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      setLastScrollY(latest);
-    });
-
-    return () => unsubscribe();
-  }, [lastScrollY, scrollY]);
+    // Keep bottom navigation always visible on mobile
+    setIsVisible(true);
+  }, []);
 
   // Only show on mobile
   const [isMobile, setIsMobile] = useState(false);
@@ -78,8 +70,8 @@ export default function BottomNavigation() {
 
   return (
     <motion.nav
-      initial={{ y: 100 }}
-      animate={{ y: isVisible ? 0 : 100 }}
+      initial={{ y: 0 }}
+      animate={{ y: 0 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
       style={{
         position: 'fixed',

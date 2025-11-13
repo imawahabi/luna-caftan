@@ -64,7 +64,7 @@ export default function ScrollToTopButton() {
       onTouchEnd={() => setIsHovered(false)}
       style={{
         position: 'fixed',
-        bottom: isMobile ? '1rem' : '2rem',
+        bottom: isMobile ? 'calc(5.5rem + 1.5rem)' : '2rem',
         right: isMobile ? '1rem' : '2rem',
         background: 'rgba(0, 0, 0, 0.4)',
         backdropFilter: 'blur(16px) saturate(150%)',

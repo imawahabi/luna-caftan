@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
-import "./globals.css";
+import './globals.css'
+import 'flag-icons/css/flag-icons.min.css'
 import { Providers } from "./providers";
 import { ProductsProvider } from "@/lib/products-context";
 import { WishlistProvider } from "@/lib/wishlist-context";

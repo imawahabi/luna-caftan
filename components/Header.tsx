@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/navigation';
-import { useLanguage } from '@/lib/language-context';
+import { Menu, X, ChevronDown, Globe, User, Heart, ShoppingBag, Search, Bookmark } from 'lucide-react';
+import Link from 'next/link';
+import { useLanguage } from '../lib/language-context';
+import { usePathname, useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { useWishlist } from '@/lib/wishlist-context';
-import { Menu, X, Bookmark } from 'lucide-react';
 import { PageType } from '@/app/page';
 
 interface HeaderProps {
@@ -14,11 +15,14 @@ interface HeaderProps {
 }
 
 export default function Header({ currentPage, navigateTo }: HeaderProps) {
-  const { t } = useTranslation();
+  const { language, changeLanguage, isChangingLanguage, t } = useLanguage();
+  const pathname = usePathname();
   const router = useRouter();
-  const { language, toggleLanguage, isChangingLanguage } = useLanguage();
-  const { wishlistCount } = useWishlist();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
+  const [isLangHovered, setIsLangHovered] = useState(false);
+  const { wishlistCount } = useWishlist();
   const [isMobile, setIsMobile] = useState(false);
 
   // Check if screen is mobile
@@ -185,35 +189,6 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
                 </span>
               )}
             </button>
-            
-            <button 
-              onClick={toggleLanguage} 
-              className="lang-toggle"
-              disabled={isChangingLanguage}
-              style={{
-                opacity: isChangingLanguage ? 0.6 : 1,
-                cursor: isChangingLanguage ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s ease',
-              }}
-            >
-              {isChangingLanguage ? (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span 
-                    style={{ 
-                      width: '16px', 
-                      height: '16px', 
-                      border: '2px solid currentColor', 
-                      borderTop: '2px solid transparent', 
-                      borderRadius: '50%', 
-                      animation: 'spin 1s linear infinite' 
-                    }}
-                  />
-                  {language === 'en' ? (isMobile ? 'ع' : 'العربية') : 'English'}
-                </span>
-              ) : (
-                language === 'en' ? (isMobile ? 'ع' : 'العربية') : 'English'
-              )}
-            </button>
           </nav>
 
           {/* Mobile Wishlist Button */}
@@ -236,13 +211,13 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
             {wishlistCount > 0 && (
               <span style={{
                 position: 'absolute',
-                top: '0',
-                right: '-2px',
+                top: '3px',
+                right: '6px',
                 background: 'linear-gradient(135deg, #e8c76f, #d4af37)',
                 color: '#1a1410',
                 fontSize: '0.65rem',
                 fontWeight: '700',
-                padding: '0.15rem 0.4rem',
+                padding: '0.15rem 0.3rem',
                 borderRadius: '10px',
                 minWidth: '18px',
                 textAlign: 'center',
@@ -254,39 +229,72 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
             )}
           </button>
 
-          {/* Mobile Language Toggle */}
-          <button 
-            onClick={toggleLanguage} 
-            className="lang-toggle mobile-lang-toggle"
+          {/* Language Toggle - Desktop & Mobile */}
+          <motion.button 
+            onClick={changeLanguage}
+            className="lang-toggle-modern"
             disabled={isChangingLanguage}
-            style={{
-              opacity: isChangingLanguage ? 0.6 : 1,
-              cursor: isChangingLanguage ? 'not-allowed' : 'pointer',
-              transition: 'all 0.3s ease',
-            }}
+            title={language === 'en' ? 'التبديل إلى العربية' : 'Switch to English'}
+            onHoverStart={() => !isMobile && setIsLangHovered(true)}
+            onHoverEnd={() => !isMobile && setIsLangHovered(false)}
           >
-            {isChangingLanguage ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span 
-                  style={{ 
-                    width: '14px', 
-                    height: '14px', 
-                    border: '2px solid currentColor', 
-                    borderTop: '2px solid transparent', 
-                    borderRadius: '50%', 
-                    animation: 'spin 1s linear infinite' 
-                  }}
-                />
-                {language === 'en' ? (isMobile ? 'ع' : 'العربية') : 'EN'}
-              </span>
-            ) : (
-              language === 'en' ? (isMobile ? 'ع' : 'العربية') : 'EN'
-            )}
-          </button>
+            <motion.div 
+              className="lang-toggle-container"
+              animate={{
+                borderRadius: isLangHovered && !isMobile ? '30px' : '50%',
+                width: isLangHovered && !isMobile ? 'auto' : '48px',
+                minWidth: isLangHovered && !isMobile ? '120px' : '48px',
+              }}
+              transition={{
+                duration: 0.35,
+                ease: [0.4, 0, 0.2, 1],
+              }}
+            >
+              {isChangingLanguage ? (
+                <div className="lang-loading">
+                  <span className="spinner" />
+                </div>
+              ) : (
+                <>
+                  {/* Active Language Flag */}
+                  <div className="lang-current">
+                    <motion.div
+                      animate={{
+                        scale: isLangHovered && !isMobile ? 1.05 : 1,
+                      }}
+                      transition={{
+                        duration: 0.3,
+                        ease: [0.4, 0, 0.2, 1],
+                      }}
+                      className="lang-flag-wrapper"
+                    >
+                      <span className={`fi ${language === 'en' ? 'fi-sa' : 'fi-gb'} fis lang-flag`}></span>
+                    </motion.div>
+                    <motion.span 
+                      className="lang-text"
+                      initial={{ opacity: 0, width: 0, marginLeft: 0 }}
+                      animate={{ 
+                        opacity: isLangHovered && !isMobile ? 1 : 0,
+                        width: isLangHovered && !isMobile ? 'auto' : 0,
+                        marginLeft: isLangHovered && !isMobile ? '0.5rem' : 0,
+                      }}
+                      transition={{ 
+                        duration: 0.35,
+                        ease: [0.4, 0, 0.2, 1],
+                        opacity: { delay: isLangHovered && !isMobile ? 0.1 : 0 }
+                      }}
+                    >
+                      {language === 'en' ? 'العربية' : 'English'}
+                    </motion.span>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </motion.button>
 
           {/* Mobile Menu Button */}
           <button onClick={toggleMobileMenu} className="mobile-menu-btn">
-            {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            {mobileMenuOpen ? <X size={21} /> : <Menu size={21} />}
           </button>
         </div>
       </header>

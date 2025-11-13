@@ -88,7 +88,7 @@ export default function PWAInstallPrompt() {
           transition={{ duration: 0.4, ease: 'easeOut' }}
           style={{
             position: 'fixed',
-            bottom: '80px', // Above bottom navigation
+            bottom: 'calc(80px + 1.5rem)', // Above bottom navigation with extra space
             left: '1rem',
             right: '1rem',
             zIndex: 40,

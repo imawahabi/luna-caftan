@@ -8,8 +8,10 @@ type Language = 'en' | 'ar';
 interface LanguageContextType {
   language: Language;
   toggleLanguage: () => void;
+  changeLanguage: () => void;
   isRTL: boolean;
   isChangingLanguage: boolean;
+  t: (key: string) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -17,7 +19,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>('en');
   const [isChangingLanguage, setIsChangingLanguage] = useState(false);
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
 
   useEffect(() => {
     const stored = localStorage.getItem('language');
@@ -71,8 +73,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       value={{
         language,
         toggleLanguage,
+        changeLanguage: toggleLanguage,
         isRTL: language === 'ar',
         isChangingLanguage,
+        t,
       }}
     >
       {children}
