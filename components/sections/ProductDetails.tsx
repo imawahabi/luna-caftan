@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProducts } from '@/lib/products-context';
 import { useWishlist } from '@/lib/wishlist-context';
@@ -60,6 +60,7 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   const [initialPinchDistance, setInitialPinchDistance] = useState<number | null>(null);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const viewIncrementedRef = useRef<string | null>(null);
 
   // Memoized similar products - must be after all useState hooks
   const similarProducts = useMemo(() => {
@@ -150,11 +151,16 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
       setHasLiked(getStoredLikedProductIds().includes(foundProduct.id));
       
       // Increment views using context function
-      incrementViews(foundProduct.id).catch(error => {
-        console.error('Failed to increment views:', error);
-      });
+      if (viewIncrementedRef.current !== foundProduct.id) {
+        incrementViews(foundProduct.id).catch(error => {
+          console.error('Failed to increment views:', error);
+        }).finally(() => {
+          viewIncrementedRef.current = foundProduct.id;
+        });
+      }
     } else {
       setHasLiked(false);
+      viewIncrementedRef.current = null;
     }
     setLoading(false);
     
@@ -163,6 +169,10 @@ export default function ProductDetails({ productId, navigateTo }: ProductDetails
       setProduct(null);
     };
   }, [productId, allProducts, productsLoading]);
+
+  useEffect(() => {
+    viewIncrementedRef.current = null;
+  }, [productId]);
 
   const handleLike = async () => {
     if (isLiking || !product) return;
