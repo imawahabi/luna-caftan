@@ -8,6 +8,8 @@ import ScrollToTopButton from '@/components/ScrollToTopButton';
 import BottomNavigation from '@/components/BottomNavigation';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 import { PageType } from '@/app/page';
+import { useProducts } from '@/lib/products-context';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -16,6 +18,7 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { loading } = useProducts();
 
   // Determine current page based on pathname
   const getCurrentPage = (): PageType => {
@@ -48,7 +51,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <div>
       <Header currentPage={getCurrentPage()} navigateTo={navigateTo} />
-      {children}
+      {loading ? (
+        <LoadingSpinner message="جاري التحميل..." fullScreen />
+      ) : (
+        children
+      )}
       <Footer navigateTo={navigateTo} />
       <ScrollToTopButton />
       <BottomNavigation />
