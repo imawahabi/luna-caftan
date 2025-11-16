@@ -80,6 +80,7 @@ export default function RootLayout({
   return (
     <html lang="ar" suppressHydrationWarning>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         <link rel="icon" href="/logo.png" type="image/png" />
       </head>
       <body className={cairo.variable} suppressHydrationWarning>

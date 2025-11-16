@@ -115,6 +115,8 @@ body {
   overflow-x: hidden;
   position: relative;
   min-height: 100vh;
+  /* Support for iPhone safe area */
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 /* خلفية ثابتة فاخرة */

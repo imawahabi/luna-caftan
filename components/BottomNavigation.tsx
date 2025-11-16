@@ -80,6 +80,9 @@ export default function BottomNavigation() {
         right: 0,
         zIndex: 50,
         direction: isRTL ? 'rtl' : 'ltr',
+        /* Ensure it sticks to the very bottom */
+        marginBottom: 0,
+        paddingBottom: 0,
       }}
     >
       <div style={{
@@ -88,7 +91,8 @@ export default function BottomNavigation() {
         WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         borderTop: '1px solid rgba(232, 199, 111, 0.2)',
         boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.3), 0 -2px 0 rgba(232, 199, 111, 0.1)',
-        padding: '0.75rem 0.5rem calc(0.75rem + env(safe-area-inset-bottom))',
+        padding: '0.75rem 0.5rem calc(0.75rem + env(safe-area-inset-bottom, 0))',
+        margin: 0,
       }}>
         <div style={{
           display: 'flex',
