@@ -55,7 +55,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     <div>
       <Header currentPage={getCurrentPage()} navigateTo={navigateTo} />
       {(loading || isNavigating) && (
-        <LoadingSpinner message="جاري التحميل..." fullScreen />
+        <LoadingSpinner fullScreen />
       )}
       {!loading && !isNavigating && children}
       <Footer navigateTo={navigateTo} />

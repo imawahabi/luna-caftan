@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface LoadingSpinnerProps {
   message?: string;
@@ -8,6 +9,9 @@ interface LoadingSpinnerProps {
 }
 
 export default function LoadingSpinner({ message, fullScreen = false }: LoadingSpinnerProps) {
+  const { i18n } = useTranslation();
+  const fallbackMessage = i18n.language === 'ar' ? 'جاري التحميل...' : 'Loading...';
+
   const containerStyle = fullScreen
     ? {
         position: 'fixed' as const,
@@ -130,7 +134,7 @@ export default function LoadingSpinner({ message, fullScreen = false }: LoadingS
           ease: 'easeInOut',
         }}
       >
-        {message || 'جاري التحميل...'}
+        {message || fallbackMessage}
       </motion.p>
 
       {/* Animated Dots */}
