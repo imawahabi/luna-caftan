@@ -10,6 +10,7 @@ import ProductCard from '@/components/ProductCard';
 import ProductCardSkeleton from '@/components/ProductCardSkeleton';
 import { useSettings } from '@/lib/settings-context';
 import { useProducts } from '@/lib/products-context';
+import { useNavigation } from '@/lib/navigation-context';
 
 interface HomePageProps {
   navigateTo: (page: PageType, productId?: string) => void;
@@ -34,6 +35,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
   const [isMobile, setIsMobile] = useState(false);
   const { products, loading } = useProducts();
   const { settings } = useSettings();
+  const { startNavigation } = useNavigation();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -60,6 +62,7 @@ export default function HomePage({ navigateTo }: HomePageProps) {
 
   // Navigate to product with SEO-friendly URL (optimized for speed)
   const navigateToProduct = (productId: string) => {
+    startNavigation();
     const product = products.find(p => p.id === productId);
     if (product) {
       const slug = generateSlug(product.nameEn);

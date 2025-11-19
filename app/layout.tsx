@@ -5,6 +5,7 @@ import 'flag-icons/css/flag-icons.min.css'
 import { Providers } from "./providers";
 import { ProductsProvider } from "@/lib/products-context";
 import { WishlistProvider } from "@/lib/wishlist-context";
+import { NavigationProvider } from "@/lib/navigation-context";
 
 const cairo = Cairo({
   variable: "--font-cairo",
@@ -85,11 +86,13 @@ export default function RootLayout({
       </head>
       <body className={cairo.variable} suppressHydrationWarning>
         <Providers>
-          <ProductsProvider>
-            <WishlistProvider>
-              {children}
-            </WishlistProvider>
-          </ProductsProvider>
+          <NavigationProvider>
+            <ProductsProvider>
+              <WishlistProvider>
+                {children}
+              </WishlistProvider>
+            </ProductsProvider>
+          </NavigationProvider>
         </Providers>
       </body>
     </html>

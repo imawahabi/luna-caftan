@@ -6,11 +6,13 @@ import { useTranslation } from 'react-i18next';
 import { useRouter, usePathname } from 'next/navigation';
 import { Home, Grid3X3, Bookmark, Phone, Info } from 'lucide-react';
 import { useWishlist } from '@/lib/wishlist-context';
+import { useNavigation } from '@/lib/navigation-context';
 
 export default function BottomNavigation() {
   const { i18n } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
+  const { startNavigation } = useNavigation();
   const isRTL = i18n.language === 'ar';
   const { wishlistCount } = useWishlist();
   const [isVisible, setIsVisible] = useState(true);
@@ -108,7 +110,10 @@ export default function BottomNavigation() {
             return (
               <motion.button
                 key={item.path}
-                onClick={() => router.push(item.path)}
+                onClick={() => {
+                  startNavigation();
+                  router.push(item.path);
+                }}
                 whileTap={{ scale: 0.9 }}
                 style={{
                   position: 'relative',

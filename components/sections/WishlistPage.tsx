@@ -10,6 +10,7 @@ import ProductCard from '@/components/ProductCard';
 import { Bookmark, Trash2, Sparkles, Heart } from 'lucide-react';
 import { generateProductSlug } from '@/lib/utils';
 import { sortTagsByLanguage } from '@/lib/tags-config';
+import { useNavigation } from '@/lib/navigation-context';
 
 export default function WishlistPage() {
   const { i18n } = useTranslation();
@@ -17,12 +18,14 @@ export default function WishlistPage() {
   const isRTL = i18n.language === 'ar';
   const { wishlist, clearWishlist, wishlistCount } = useWishlist();
   const { products } = useProducts();
+  const { startNavigation } = useNavigation();
 
   // Filter products that are in wishlist
   const wishlistProducts = products.filter(product => wishlist.includes(product.id));
 
   const handleProductClick = (product: any) => {
     const slug = generateProductSlug(product);
+    startNavigation();
     router.push(`/caftans/${slug}`);
   };
 
@@ -241,7 +244,10 @@ export default function WishlistPage() {
             }
           </p>
           <motion.button
-            onClick={() => router.push('/collection')}
+            onClick={() => {
+              startNavigation();
+              router.push('/collection');
+            }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="btn btn-primary"

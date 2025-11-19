@@ -8,6 +8,7 @@ import ProductDetails from '@/components/sections/ProductDetails';
 import AppLayout from '@/components/AppLayout';
 import { useProducts } from '@/lib/products-context';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useNavigation } from '@/lib/navigation-context';
 
 interface CaftanPageProps {
   params: Promise<{
@@ -19,6 +20,7 @@ export default function CaftanPage({ params }: CaftanPageProps) {
   const router = useRouter();
   const { i18n } = useTranslation();
   const { products, loading: productsLoading } = useProducts();
+  const { startNavigation } = useNavigation();
   const [productId, setProductId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +57,7 @@ export default function CaftanPage({ params }: CaftanPageProps) {
   }, [resolvedParams.slug, products, productsLoading]);
 
   const navigateTo = async (page: PageType, productId?: string) => {
+    startNavigation();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     if (page === 'home') {
@@ -115,7 +118,10 @@ export default function CaftanPage({ params }: CaftanPageProps) {
               : 'Sorry, this caftan does not exist or has been removed'}
           </p>
           <button
-            onClick={() => router.push('/')}
+            onClick={() => {
+              startNavigation();
+              router.push('/');
+            }}
             style={{
               padding: '1rem 2rem',
               background: 'linear-gradient(135deg, rgba(232, 199, 111, 0.2), rgba(212, 175, 55, 0.15))',

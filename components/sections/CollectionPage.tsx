@@ -11,6 +11,7 @@ import ProductCard from '@/components/ProductCard';
 import ProductCardSkeleton from '@/components/ProductCardSkeleton';
 import WishlistButton from '@/components/WishlistButton';
 import { getProductTags } from '@/lib/tags-config';
+import { useNavigation } from '@/lib/navigation-context';
 import { 
   StatsSkeleton, 
   SearchSkeleton, 
@@ -42,6 +43,7 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const { products, loading } = useProducts();
+  const { startNavigation } = useNavigation();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [filterType, setFilterType] = useState<'all' | 'featured'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -114,6 +116,7 @@ export default function CollectionPage({ navigateTo }: CollectionPageProps) {
 
   // Navigate to product with SEO-friendly URL (optimized for speed)
   const navigateToProduct = useCallback((productId: string) => {
+    startNavigation();
     const product = products.find(p => p.id === productId);
     if (product) {
       const slug = generateSlug(product.nameEn);

@@ -8,6 +8,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useWishlist } from '@/lib/wishlist-context';
 import { PageType } from '@/app/page';
+import { useNavigation } from '@/lib/navigation-context';
 
 interface HeaderProps {
   currentPage: PageType;
@@ -24,6 +25,7 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
   const [isLangHovered, setIsLangHovered] = useState(false);
   const { wishlistCount } = useWishlist();
   const [isMobile, setIsMobile] = useState(false);
+  const { startNavigation } = useNavigation();
 
   // Check if screen is mobile
   useEffect(() => {
@@ -154,6 +156,7 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
             {/* Wishlist Button - Desktop (after Contact) */}
             <button
               onClick={() => {
+                startNavigation();
                 router.push('/wishlist');
               }}
               className="desktop-wishlist-btn"
@@ -200,6 +203,7 @@ export default function Header({ currentPage, navigateTo }: HeaderProps) {
             {/* Mobile Wishlist Button */}
             <button
               onClick={() => {
+                startNavigation();
                 router.push('/wishlist');
               }}
               style={{
