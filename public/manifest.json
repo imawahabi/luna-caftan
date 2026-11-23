@@ -1,0 +1,50 @@
+{
+  "name": "Luna Caftan - قفاطين مغربية فاخرة",
+  "short_name": "Luna Caftan",
+  "description": "قفاطين مغربية فاخرة مصنوعة يدوياً من فاس إلى الكويت | Luxury Moroccan Caftans",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#e8c76f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "القفاطين",
+      "short_name": "Collection",
+      "description": "تصفح مجموعة القفاطين",
+      "url": "/collection",
+      "icons": [{ "src": "/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "المفضلة",
+      "short_name": "Wishlist",
+      "description": "قائمة القفاطين المفضلة",
+      "url": "/wishlist",
+      "icons": [{ "src": "/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "تواصل معنا",
+      "short_name": "Contact",
+      "description": "تواصل معنا عبر واتساب",
+      "url": "/contact",
+      "icons": [{ "src": "/logo.png", "sizes": "96x96" }]
+    }
+  ],
+  "categories": ["shopping", "lifestyle", "fashion"],
+  "lang": "ar",
+  "dir": "rtl"
+}

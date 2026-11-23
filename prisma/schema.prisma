@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Admin User Model
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Product/Caftan Model
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  nameEn        String
+  description   String
+  descriptionEn String
+  price         String
+  priceEn       String
+  details       String   // JSON string array
+  detailsEn     String   // JSON string array
+  images        String   // JSON string array
+  featured      Boolean  @default(false)
+  active        Boolean  @default(true)
+  likes         Int      @default(0)
+  tags          String   @default("[]") // JSON string array for Arabic tags
+  tagsEn        String   @default("[]") // JSON string array for English tags
+  views         Int      @default(0) // View count
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([featured])
+  @@index([views])
+}
+
+// Site Settings Model
+model Settings {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum ContactMessageStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+enum ContactInquiryType {
+  GENERAL
+  CAFTAN
+}
+
+model ContactMessage {
+  id         String               @id @default(cuid())
+  name       String
+  email      String
+  phoneCountryCode String?
+  phoneNumber String?
+  message    String
+  inquiryType ContactInquiryType  @default(GENERAL)
+  inquiryProductId String?
+  inquiryProductName String?
+  inquiryProductNameEn String?
+  adminEmail String
+  status     ContactMessageStatus @default(PENDING)
+  emailError String?
+  emailSentAt DateTime?
+  read       Boolean              @default(false)
+  readAt     DateTime?
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([read])
+  @@index([inquiryType])
+}
+
+model VisitorSession {
+  id          String        @id @default(cuid())
+  sessionKey  String        @unique
+  countryCode String?
+  countryName String?
+  userAgent   String?
+  lastPath    String?
+  firstSeenAt DateTime      @default(now())
+  lastSeenAt  DateTime      @default(now())
+  pageViews   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  visits      VisitorVisit[]
+
+  @@index([lastSeenAt])
+  @@index([countryCode])
+}
+
+model VisitorVisit {
+  id          String         @id @default(cuid())
+  sessionId   String
+  session     VisitorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  path        String
+  countryCode String?
+  countryName String?
+  createdAt   DateTime       @default(now())
+
+  @@index([sessionId])
+  @@index([createdAt])
+  @@index([countryCode])
+  @@index([path])
+}
