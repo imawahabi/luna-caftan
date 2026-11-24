@@ -1,4 +1,4 @@
-# Luna Caftan — لونا قفطان
+# Luna Caftan
 
 **A bilingual (Arabic / English) e-commerce storefront and admin CMS for a luxury Moroccan caftan boutique — handcrafted caftans from Fes, sold in Kuwait.**
 
@@ -41,7 +41,7 @@ needed for day-to-day operations.
 | --- | --- |
 | ![Home on MacBook Pro](docs/mockups/macbook-home.png) | ![Collection on MacBook Pro](docs/mockups/macbook-collection.png) |
 
-| Product page | Admin sign-in (لوحة تحكم لونا) |
+| Product page | Admin sign-in |
 | --- | --- |
 | ![Product page on MacBook Pro](docs/mockups/macbook-product.png) | ![Admin sign-in on MacBook Pro](docs/mockups/macbook-admin-login.png) |
 
@@ -97,5 +97,5 @@ Seed helpers live in `scripts/` (`create-admin.ts`, `migrate-products.ts`,
 
 - Product photography and prices shown in the screenshots are the boutique's
   real, publicly displayed catalogue.
-- The storefront defaults to English with an Arabic toggle (العربية) in the
+- The storefront defaults to English with an Arabic toggle in the
   header; the admin panel is Arabic-first.
